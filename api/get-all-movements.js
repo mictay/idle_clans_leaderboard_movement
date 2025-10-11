@@ -1,16 +1,5 @@
 import { kv } from '@vercel/kv';
-
-// These lists must be kept in sync with the cron job (`update-leaderboard.js`)
-const LEADERBOARD_TYPES = ['default', 'ironman', 'groupironman'];
-const SKILLS = [
-    'total_level', 'smithing', 'woodcutting', 'crafting', 'enchanting',
-    'farming', 'foraging', 'carpentry', 'plundering', 'mining',
-    'cooking', 'brewing', 'agility', 'fishing', 'exterminating',
-    'attack', 'strength', 'magic', 'defence', 'archery', 'health',
-    'zeus', 'medusa', 'hades', 'griffin', 'devil', 'chimera', 'sobek',
-    'kronos', 'malignant_spider', 'skeleton_warrior', 'otherworldly_golem',
-    'reckoning_of_the_gods', 'guardians_of_the_citadel', 'bloodmoon_massacre'
-];
+import { LEADERBOARD_TYPES, SKILLS } from '../lib/constants.js';
 
 export default async function handler(request, response) {
     const keysToFetch = [];
