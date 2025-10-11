@@ -402,8 +402,22 @@
                 rankDurationSpan.textContent = durationText;
                 scoreDurationSpan.textContent = durationText;
 
+                // --- CORRECTED: Re-added the logic to update the main timestamp display ---
+                if (timestamps.lastUpdated) {
+                    const lastDate = new Date(timestamps.lastUpdated).toLocaleString();
+                    let displayText = `Last Updated: ${lastDate}`;
+                    if (timestamps.previousUpdated) {
+                        const prevDate = new Date(timestamps.previousUpdated).toLocaleString();
+                        displayText += ` (Previously: ${prevDate})`;
+                    }
+                    updatedText.textContent = displayText;
+                } else {
+                    updatedText.textContent = 'No update time available for this leaderboard.';
+                }
+                // --- End of correction ---
+
                 sortData();
-                renderLeaderboardTable(); // CORRECTED FUNCTION NAME
+                renderLeaderboardTable();
                 updateSortIndicators();
             }
 
@@ -417,14 +431,6 @@
                     allMovementsData = data.movementsData;
                     allTimestamps = data.timestamps;
                     allTopMovers = data.topMovers;
-
-                    const firstKey = Object.keys(allTimestamps)[0];
-                    const firstTimestamp = allTimestamps[firstKey] || {};
-                    if (firstTimestamp.lastUpdated) {
-                        updatedText.textContent = `Data loaded successfully. Last batch updated around ${new Date(firstTimestamp.lastUpdated).toLocaleString()}.`;
-                    } else {
-                        updatedText.textContent = "Data loaded. No recent updates found.";
-                    }
 
                     updateLeaderboardView();
                     updateTopMoversViews();
@@ -461,7 +467,7 @@
                         currentSortDirection = 'asc';
                     }
                     sortData();
-                    renderLeaderboardTable(); // CORRECTED FUNCTION NAME
+                    renderLeaderboardTable();
                     updateSortIndicators();
                 });
             });
