@@ -6,40 +6,56 @@
     <title>Idle Clans Leaderboard Movement</title>
     <style>
         body { font-family: sans-serif; background-color: #f0f2f5; color: #1c1e21; }
-        table { width: 80%; margin: 2rem auto; border-collapse: collapse; }
+        .container { width: 80%; margin: 2rem auto; }
+        table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
         th { background-color: #e9ecef; }
+        #last-updated { color: #606770; font-style: italic; }
         .positive { color: green; }
         .negative { color: red; }
     </style>
 </head>
 <body>
-    <h1>Idle Clans Daily Leaderboard Movement</h1>
-    <table id="leaderboard-table">
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Player</th>
-                <th>Movement (24h)</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
+    <div class="container">
+        <h1>Idle Clans Daily Leaderboard Movement</h1>
+        <p id="last-updated">Loading...</p> <table id="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Movement (24h)</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
 
     <script>
         async function fetchAndDisplayLeaderboard() {
             const tableBody = document.querySelector("#leaderboard-table tbody");
+            const updatedText = document.querySelector("#last-updated");
             tableBody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
 
             try {
                 const response = await fetch('/api/get-movements');
-                const players = await response.json();
+                const data = await response.json(); // Data is now { movements: [], lastUpdated: '...' }
 
-                // Sort players by their current rank
+                const players = data.movements;
+                const lastUpdated = data.lastUpdated;
+
+                // Display the last updated time
+                if (lastUpdated) {
+                    const date = new Date(lastUpdated);
+                    // Format the date to be more readable
+                    updatedText.textContent = `Last Updated: ${date.toLocaleString()}`;
+                } else {
+                    updatedText.textContent = 'No update time available.';
+                }
+
                 players.sort((a, b) => a.currentRank - b.currentRank);
 
-                tableBody.innerHTML = ''; // Clear loading message
+                tableBody.innerHTML = '';
 
                 if (players.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="3">No data available yet. Check back tomorrow!</td></tr>';
@@ -68,11 +84,11 @@
                 });
             } catch (error) {
                 tableBody.innerHTML = '<tr><td colspan="3">Failed to load data.</td></tr>';
+                updatedText.textContent = 'Could not load update time.';
                 console.error("Error fetching leaderboard:", error);
             }
         }
 
-        // Fetch data when the page loads
         fetchAndDisplayLeaderboard();
     </script>
 </body>

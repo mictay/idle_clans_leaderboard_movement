@@ -1,54 +1,41 @@
 import { kv } from '@vercel/kv';
 
 export default async function handler(request, response) {
-    // 1. Define the leaderboard and construct the API URL and KV keys
+    // 1. Define keys
     const leaderboardType = 'groupironman';
     const skill = 'foraging';
     const leaderboardName = `${leaderboardType}-${skill}`;
     const apiUrl = `https://query.idleclans.com/api/Leaderboard/top/players:${leaderboardType}/${skill}`;
     const movementsKey = `leaderboard:movements:${leaderboardName}`;
+    const lastUpdatedKey = `last-updated:${leaderboardName}`; // New key for the timestamp
 
-    // 2. Fetch current leaderboard data from the Idle Clans API
+    // ... (The rest of the fetching and processing logic remains the same) ...
     const apiResponse = await fetch(apiUrl);
     if (!apiResponse.ok) {
         return response.status(500).json({ error: 'Failed to fetch Idle Clans API' });
     }
     const currentLeaderboard = await apiResponse.json();
 
-    // ====================================================================
-    // === NEW: Step 3 - Clean up players who fell off the leaderboard ===
-    // ====================================================================
-
-    // Create a Set of current players for very fast lookups (O(1) complexity)
+    // (Cleanup logic for dropped players - no changes here)
     const currentPlayerUsernames = new Set(currentLeaderboard.map(p => p.username));
-
-    // Get the results we saved yesterday
     const previousResults = await kv.get(movementsKey);
     const playersToDelete = [];
 
     if (previousResults && Array.isArray(previousResults)) {
         for (const oldPlayer of previousResults) {
-            // If a player from yesterday's list is NOT in today's list...
             if (!currentPlayerUsernames.has(oldPlayer.username)) {
-                // ...add their specific KV key to a deletion list.
                 const playerKey = `${leaderboardName}:player:${oldPlayer.username}`;
                 playersToDelete.push(playerKey);
             }
         }
     }
 
-    // Delete all the dropped-off players from KV.
-    // Using Promise.all is more efficient than awaiting each deletion one by one.
     if (playersToDelete.length > 0) {
         await Promise.all(playersToDelete.map(key => kv.del(key)));
     }
 
-    // ====================================================================
-    // === Step 4 - Process the current leaderboard (existing logic)    ===
-    // ====================================================================
-
+    // (Movement calculation logic - no changes here)
     const movementResults = [];
-
     for (const [index, player] of currentLeaderboard.entries()) {
         const playerName = player.username;
         const currentRank = index + 1;
@@ -68,14 +55,15 @@ export default async function handler(request, response) {
             score: player.score
         });
 
-        // Save the new rank for tomorrow's comparison
         await kv.set(playerKey, currentRank);
     }
 
-    // 5. Store the final calculated movements in the single key for the frontend
+    // 5. Store the final calculated movements AND the new timestamp
+    const currentTime = new Date().toISOString();
     await kv.set(movementsKey, movementResults);
+    await kv.set(lastUpdatedKey, currentTime); // Save the current time
 
-    // 6. Send a success response
+    // (Response logic - no changes here)
     response.status(200).json({
         status: 'OK',
         leaderboard: leaderboardName,

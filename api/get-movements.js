@@ -1,11 +1,17 @@
 import { kv } from '@vercel/kv';
 
 export default async function handler(request, response) {
-    // Define which leaderboard to show. This should match the one in the update script.
     const leaderboardName = 'groupironman-foraging';
+    const movementsKey = `leaderboard:movements:${leaderboardName}`;
+    const lastUpdatedKey = `last-updated:${leaderboardName}`; // Key for the timestamp
 
-    const movements = await kv.get(`leaderboard:movements:${leaderboardName}`);
+    // Fetch both pieces of data from the database
+    const movements = await kv.get(movementsKey);
+    const lastUpdated = await kv.get(lastUpdatedKey);
 
-    // Return the data, or an empty array if no data has been saved yet
-    response.status(200).json(movements || []);
+    // Return an object containing both movements and the timestamp
+    response.status(200).json({
+        movements: movements || [],
+        lastUpdated: lastUpdated || null
+    });
 }

@@ -1,5 +1,6 @@
 # Vercel
-The hosting provider
+Vercel is the application hosting provider.
+Application URL: idle-clans-leaderboard-movement.vercel.app
 UpStash is the database provider
 Redis was also created, but not used at this time.
 
