@@ -22,39 +22,169 @@
             --hover-bg: #edf2f7;
             --footer-text-color: #718096;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 1rem; }
-        .container { max-width: 1024px; margin: 2rem auto; padding: 1.5rem; background-color: var(--container-bg); border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); }
-        .main-title { color: var(--header-color); font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; text-align: center; }
-        #leaderboard-title { color: var(--header-color); font-size: 1.5rem; font-weight: 600; margin-top: 0; margin-bottom: 0.5rem; text-align: center; }
-        #last-updated { color: #718096; margin-top: 0; margin-bottom: 2rem; font-style: italic; text-align: center; }
-        .controls { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; }
-        .control-group { display: flex; flex-direction: column; }
-        .controls label { font-weight: 600; margin-bottom: 0.5rem; }
-        .controls select { padding: 0.75rem; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 6px; background-color: white; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; }
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 1rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-        th { font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; color: #718096; }
-        tbody tr:hover { background-color: var(--hover-bg); }
-        .positive, .negative { font-weight: 600; }
-        .positive { color: var(--positive-color); }
-        .negative { color: var(--negative-color); }
-        .site-footer { text-align: center; padding: 1rem; margin-top: 1rem; color: var(--footer-text-color); font-size: 0.875rem; line-height: 1.5; }
-        .site-footer p { margin: 0.5rem 0; }
-        .sortable { cursor: pointer; position: relative; user-select: none; }
-        .sortable:hover { background-color: var(--hover-bg); }
-        .sort-indicator { display: inline-block; width: 1em; margin-left: 0.5em; color: var(--primary-color); }
-        .view-toggles { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
-        .toggle-btn { padding: 0.75rem 1.5rem; border: 1px solid var(--border-color); background-color: #fff; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
-        .toggle-btn.active { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); }
-        .view { display: none; }
-        .view.active { display: block; }
-
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 1024px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .main-title {
+            color: var(--header-color);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        #leaderboard-title {
+            color: var(--header-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        #last-updated {
+            color: #718096;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            font-style: italic;
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .controls label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .controls select {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: white;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #718096;
+        }
+        tbody tr:hover {
+            background-color: var(--hover-bg);
+        }
+        .positive, .negative {
+            font-weight: 600;
+        }
+        .positive {
+            color: var(--positive-color);
+        }
+        .negative {
+            color: var(--negative-color);
+        }
+        .site-footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: var(--footer-text-color);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .site-footer p {
+            margin: 0.5rem 0;
+        }
+        .sortable {
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+        .sortable:hover {
+            background-color: var(--hover-bg);
+        }
+        .sort-indicator {
+            display: inline-block;
+            width: 1em;
+            margin-left: 0.5em;
+            color: var(--primary-color);
+        }
+        .view-toggles {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .toggle-btn {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .toggle-btn.active {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+        }
         @media (min-width: 768px) {
-            .controls { flex-direction: row; align-items: center; }
-            .control-group { flex-grow: 1; }
-            .main-title { font-size: 2.25rem; }
-            #leaderboard-title { font-size: 1.75rem; }
+            .controls {
+                flex-direction: row;
+                align-items: center;
+            }
+            .control-group {
+                flex-grow: 1;
+            }
+            .main-title {
+                font-size: 2.25rem;
+            }
+            #leaderboard-title {
+                font-size: 1.75rem;
+            }
         }
     </style>
 </head>
@@ -77,7 +207,42 @@
             <div class="control-group" id="skill-selector-group">
                 <label for="skill-selector">Skill</label>
                 <select id="skill-selector">
-                    </select>
+                    <option value="total_level" selected>Total Exp</option>
+                    <option value="smithing">Smithing</option>
+                    <option value="woodcutting">Woodcutting</option>
+                    <option value="crafting">Crafting</option>
+                    <option value="enchanting">Enchanting</option>
+                    <option value="farming">Farming</option>
+                    <option value="foraging">Foraging</option>
+                    <option value="carpentry">Carpentry</option>
+                    <option value="plundering">Plundering</option>
+                    <option value="mining">Mining</option>
+                    <option value="cooking">Cooking</option>
+                    <option value="brewing">Brewing</option>
+                    <option value="agility">Agility</option>
+                    <option value="fishing">Fishing</option>
+                    <option value="exterminating">Exterminating</option>
+                    <option value="attack">Attack</option>
+                    <option value="strength">Strength</option>
+                    <option value="magic">Magic</option>
+                    <option value="defence">Defence</option>
+                    <option value="archery">Archery</option>
+                    <option value="health">Health</option>
+                    <option value="zeus">Zeus</option>
+                    <option value="medusa">Medusa</option>
+                    <option value="hades">Hades</option>
+                    <option value="griffin">Griffin</option>
+                    <option value="devil">Devil</option>
+                    <option value="chimera">Chimera</option>
+                    <option value="sobek">Sobek</option>
+                    <option value="kronos">Kronos</option>
+                    <option value="malignant_spider">Malignant Spider</option>
+                    <option value="skeleton_warrior">Skeleton Warrior</option>
+                    <option value="otherworldly_golem">Otherworldly Golem</option>
+                    <option value="reckoning_of_the_gods">Reckoning Of The Gods</option>
+                    <option value="guardians_of_the_citadel">Guardians Of The Citadel</option>
+                    <option value="bloodmoon_massacre">Bloodmoon Massacre</option>
+                </select>
             </div>
         </div>
 
@@ -90,7 +255,18 @@
         <div id="leaderboard-view" class="view active">
             <h2 id="leaderboard-title"></h2>
             <div class="table-wrapper">
-                <table id="leaderboard-table"></table>
+                <table id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="currentRank">Rank <span class="sort-indicator"></span></th>
+                            <th class="sortable" data-sort="username">Player <span class="sort-indicator"></span></th>
+                            <th class="sortable" data-sort="score">Exp <span class="sort-indicator"></span></th>
+                            <th class="sortable" data-sort="movement">Rank Change <span id="rank-change-duration">(Daily)</span> <span class="sort-indicator"></span></th>
+                            <th class="sortable" data-sort="scoreDelta">Exp Change <span id="score-change-duration">(Daily)</span> <span class="sort-indicator"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
 
@@ -110,14 +286,18 @@
     </div>
 
     <footer class="site-footer">
-        </footer>
+        <p>This site is a fan site only and has no affiliation with Idle Clans.</p>
+        <p>This updates midnight UTC, and takes about 10 minutes due to api throttling rules.<br/>
+        I'm just a player like you, and if you have questions or suggestions, go to channel's discord #api-and-modding.</p>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- GLOBAL STATE ---
             let allMovementsData = {};
             let allTimestamps = {};
-            let currentPlayers = []; // For the main leaderboard view
+            let allTopMovers = { gainers: {}, losers: {} };
+            let currentPlayers = [];
             let currentSortColumn = 'currentRank';
             let currentSortDirection = 'asc';
 
@@ -129,92 +309,101 @@
             const leaderboardTitle = document.querySelector("#leaderboard-title");
             const views = document.querySelectorAll('.view');
             const toggleButtons = document.querySelectorAll('.toggle-btn');
+            const leaderboardTable = document.querySelector("#leaderboard-table");
+            const rankDurationSpan = document.querySelector("#rank-change-duration");
+            const scoreDurationSpan = document.querySelector("#score-change-duration");
 
             // --- UTILITY FUNCTIONS ---
             const formatSkillName = (skill) => skill.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            const formatDuration = (last, previous) => { /* Unchanged */ };
-
-            // --- DATA PROCESSING LOGIC ---
-            function updateTopMoversViews() {
-                const leaderboardType = leaderboardSelector.value;
-                const flatPlayerList = [];
-                for (const key in allMovementsData) {
-                    if (key.startsWith(leaderboardType)) {
-                        const skill = key.substring(leaderboardType.length + 1);
-                        allMovementsData[key].forEach(player => {
-                            if (player.movement !== 0) {
-                                flatPlayerList.push({ ...player, leaderboardType, skill });
-                            }
-                        });
-                    }
-                }
-
-                flatPlayerList.sort((a, b) => b.movement - a.movement);
-                const topGainers = flatPlayerList.slice(0, 10);
-
-                flatPlayerList.sort((a, b) => a.movement - b.movement);
-                const topLosers = flatPlayerList.filter(p => p.movement < 0).slice(0, 10);
-
-                renderTopMoversTable("#gains-table", topGainers, true);
-                renderTopMoversTable("#losses-table", topLosers, false);
-            }
+            const formatDuration = (last, previous) => {
+                if (!last || !previous) return "(Daily)";
+                const diffMs = new Date(last).getTime() - new Date(previous).getTime();
+                if (diffMs <= 0) return "(Daily)";
+                const totalHours = diffMs / 3600000;
+                const hours = Math.floor(totalHours);
+                const minutes = Math.round((totalHours - hours) * 60);
+                return `(${hours}h ${minutes}m)`;
+            };
 
             // --- RENDERING LOGIC ---
             function renderTopMoversTable(tableId, players, isGainers) {
                 const table = document.querySelector(tableId);
-                let content = `
-                    <thead>
-                        <tr>
-                            <th>Player</th>
-                            <th>Skill</th>
-                            <th>Rank Change</th>
-                            <th>Exp Change</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
+                let content = `<thead><tr><th>Player</th><th>Skill</th><th>Rank Change</th><th>Exp Change</th></tr></thead><tbody>`;
                 if (players.length === 0) {
                     content += `<tr><td colspan="4" style="text-align: center; padding: 2rem;">No significant movements found.</td></tr>`;
                 } else {
                     players.forEach(p => {
-                        const skillName = formatSkillName(p.skill);
-                        const rankChangeText = p.movement > 0 ? `+${p.movement}` : p.movement;
-                        const expChangeText = p.scoreDelta > 0 ? `+${p.scoreDelta.toLocaleString()}` : p.scoreDelta.toLocaleString();
-
-                        content += `
-                            <tr>
-                                <td>${p.username}</td>
-                                <td>${skillName}</td>
-                                <td class="${isGainers ? 'positive' : 'negative'}">${rankChangeText}</td>
-                                <td class="${p.scoreDelta > 0 ? 'positive' : 'negative'}">${expChangeText}</td>
-                            </tr>`;
+                        const rankChangeClass = isGainers ? 'positive' : 'negative';
+                        const expChangeClass = p.scoreDelta > 0 ? 'positive' : 'negative';
+                        content += `<tr>
+                            <td>${p.username}</td>
+                            <td>${formatSkillName(p.skill)}</td>
+                            <td class="${rankChangeClass}">${p.movement > 0 ? '+' : ''}${p.movement}</td>
+                            <td class="${expChangeClass}">${p.scoreDelta > 0 ? '+' : ''}${p.scoreDelta.toLocaleString()}</td>
+                        </tr>`;
                     });
                 }
                 table.innerHTML = content + `</tbody>`;
             }
 
-            function renderLeaderboardTable() { /* Unchanged from previous version */ }
-            function sortData() { /* Unchanged */ }
-            function updateSortIndicators() { /* Unchanged */ }
+            function renderLeaderboardTable() {
+                const tbody = leaderboardTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                if (currentPlayers.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem;">No data available.</td></tr>`;
+                    return;
+                }
+                currentPlayers.forEach(p => {
+                    const row = document.createElement('tr');
+                    const expChangeClass = p.scoreDelta > 0 ? 'positive' : 'negative';
+                    const rankChangeClass = p.movement > 0 ? 'positive' : 'negative';
+                    row.innerHTML = `
+                        <td>${p.currentRank}</td>
+                        <td>${p.username}</td>
+                        <td>${p.score.toLocaleString()}</td>
+                        <td class="${rankChangeClass}">${p.movement > 0 ? '+' : ''}${p.movement}</td>
+                        <td class="${expChangeClass}">${p.scoreDelta > 0 ? '+' : ''}${p.scoreDelta.toLocaleString()}</td>`;
+                    tbody.appendChild(row);
+                });
+            }
 
-            // --- MAIN VIEW UPDATE LOGIC ---
+            // --- DATA & VIEW UPDATE LOGIC ---
+            function sortData() {
+                currentPlayers.sort((a, b) => {
+                    const valA = a[currentSortColumn];
+                    const valB = b[currentSortColumn];
+                    const comparison = typeof valA === 'string' ? valA.localeCompare(valB) : valA - valB;
+                    return currentSortDirection === 'desc' ? -comparison : comparison;
+                });
+            }
+
+            function updateSortIndicators() {
+                leaderboardTable.querySelectorAll('.sortable').forEach(header => {
+                    const indicator = header.querySelector('.sort-indicator');
+                    indicator.textContent = header.dataset.sort === currentSortColumn ? (currentSortDirection === 'asc' ? '▲' : '▼') : '';
+                });
+            }
+
+            function updateTopMoversViews() {
+                const leaderboardType = leaderboardSelector.value;
+                renderTopMoversTable("#gains-table", allTopMovers.gainers[leaderboardType] || [], true);
+                renderTopMoversTable("#losses-table", allTopMovers.losers[leaderboardType] || [], false);
+            }
+
             function updateLeaderboardView() {
                 const leaderboardType = leaderboardSelector.value;
                 const skill = skillSelector.value;
                 const leaderboardKey = `${leaderboardType}-${skill}`;
-
                 currentPlayers = allMovementsData[leaderboardKey] || [];
                 const timestamps = allTimestamps[leaderboardKey] || {};
 
-                const leaderboardText = leaderboardSelector.options[leaderboardSelector.selectedIndex].text;
-                const skillText = skillSelector.options[skillSelector.selectedIndex].text;
-                leaderboardTitle.textContent = `${leaderboardText} - ${skillText}`;
-
+                leaderboardTitle.textContent = `${leaderboardSelector.options[leaderboardSelector.selectedIndex].text} - ${skillSelector.options[skillSelector.selectedIndex].text}`;
                 const durationText = formatDuration(timestamps.lastUpdated, timestamps.previousUpdated);
-                // ... update header spans ...
+                rankDurationSpan.textContent = durationText;
+                scoreDurationSpan.textContent = durationText;
 
                 sortData();
-                renderLeaderboardTable();
+                renderTable();
                 updateSortIndicators();
             }
 
@@ -222,11 +411,20 @@
             async function initialize() {
                 try {
                     const response = await fetch('/api/get-all-movements');
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const data = await response.json();
+
                     allMovementsData = data.movementsData;
                     allTimestamps = data.timestamps;
+                    allTopMovers = data.topMovers;
 
-                    updatedText.textContent = "Data loaded successfully.";
+                    const firstKey = Object.keys(allTimestamps)[0];
+                    const firstTimestamp = allTimestamps[firstKey] || {};
+                    if (firstTimestamp.lastUpdated) {
+                        updatedText.textContent = `Data loaded successfully. Last batch updated around ${new Date(firstTimestamp.lastUpdated).toLocaleString()}.`;
+                    } else {
+                        updatedText.textContent = "Data loaded. No recent updates found.";
+                    }
 
                     updateLeaderboardView();
                     updateTopMoversViews();
@@ -253,7 +451,21 @@
 
             skillSelector.addEventListener('change', updateLeaderboardView);
 
-            // --- START THE APP ---
+            leaderboardTable.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', () => {
+                    const sortKey = header.dataset.sort;
+                    if (sortKey === currentSortColumn) {
+                        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSortColumn = sortKey;
+                        currentSortDirection = 'asc';
+                    }
+                    sortData();
+                    renderTable();
+                    updateSortIndicators();
+                });
+            });
+
             initialize();
         });
     </script>
