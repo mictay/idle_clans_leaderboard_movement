@@ -15,3 +15,26 @@ vercel dev
 ```
 This will run the project on http://localhost:3000
 
+# Idle Clans
+api docs:  https://query.idleclans.com/api-docs/index.html
+
+## Sample api calls
+https://query.idleclans.com/api/Leaderboard/top/players:groupironman/foraging
+https://query.idleclans.com/api/Player/profile/DerfRevrac
+https://query.idleclans.com/api/Leaderboard/profile/players:groupironman/DerfRevrac
+
+## Skills
+total_level
+smithing
+woodcutting
+crafting
+enchanting
+farming
+foraging
+carpentry
+plundering
+mining
+cooking
+brewing
+agility
+fishing

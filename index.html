@@ -4,91 +4,277 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Idle Clans Leaderboard Movement</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: sans-serif; background-color: #f0f2f5; color: #1c1e21; }
-        .container { width: 80%; margin: 2rem auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background-color: #e9ecef; }
-        #last-updated { color: #606770; font-style: italic; }
-        .positive { color: green; }
-        .negative { color: red; }
+        /* CSS Variables for easy theme changes */
+        :root {
+            --background-color: #f4f7f9;
+            --container-bg: #ffffff;
+            --text-color: #2d3748;
+            --header-color: #1a202c;
+            --border-color: #e2e8f0;
+            --primary-color: #4299e1;
+            --positive-color: #38a169;
+            --negative-color: #e53e3e;
+            --hover-bg: #edf2f7;
+            --footer-text-color: #718096;
+        }
+
+        /* General Body Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 1rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1024px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Header and Title */
+        #leaderboard-title {
+            color: var(--header-color);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        #last-updated {
+            color: #718096;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        /* Control Section (Dropdowns) */
+        .controls {
+            display: flex;
+            flex-direction: column; /* Stacks on mobile */
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .controls label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .controls select {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: white;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+        }
+
+        /* Table Wrapper for Horizontal Scrolling on Small Screens */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #718096;
+        }
+        tbody tr:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* Styling for Movement and Score Delta */
+        .positive, .negative {
+            font-weight: 600;
+        }
+        .positive {
+            color: var(--positive-color);
+        }
+        .negative {
+            color: var(--negative-color);
+        }
+
+        /* --- NEW: Footer Styles --- */
+        .site-footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: var(--footer-text-color);
+            font-size: 0.875rem;
+        }
+
+        /* --- Responsive Design --- */
+
+        /* Tablet and larger screens */
+        @media (min-width: 768px) {
+            .controls {
+                flex-direction: row; /* Side-by-side on larger screens */
+                align-items: center;
+            }
+            .control-group {
+                flex-grow: 1; /* Allows groups to take up available space */
+            }
+            #leaderboard-title {
+                font-size: 2.25rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Idle Clans Daily Leaderboard Movement</h1>
-        <p id="last-updated">Loading...</p> <table id="leaderboard-table">
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Player</th>
-                    <th>Movement (24h)</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-        </table>
+        <header>
+            <h1 id="leaderboard-title">Idle Clans Daily Leaderboard</h1>
+            <p id="last-updated">Loading...</p>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="leaderboard-selector">Game Mode</label>
+                <select id="leaderboard-selector">
+                    <option value="groupironman" selected>Group Ironman</option>
+                    <option value="ironman">Ironman</option>
+                    <option value="default">Default</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="skill-selector">Skill</label>
+                <select id="skill-selector">
+                    <option value="total_level" selected>Total Level</option>
+                    <option value="smithing">Smithing</option>
+                    <option value="woodcutting">Woodcutting</option>
+                    <option value="crafting">Crafting</option>
+                    <option value="enchanting">Enchanting</option>
+                    <option value="farming">Farming</option>
+                    <option value="foraging">Foraging</option>
+                    <option value="carpentry">Carpentry</option>
+                    <option value="plundering">Plundering</option>
+                    <option value="mining">Mining</option>
+                    <option value="cooking">Cooking</option>
+                    <option value="brewing">Brewing</option>
+                    <option value="agility">Agility</option>
+                    <option value="fishing">Fishing</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Rank Change (24h)</th>
+                        <th>Score Change (24h)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
     </div>
 
+    <footer class="site-footer">
+        <p>This site is a fan site only and has no affiliation with Idle Clans.</p>
+    </footer>
+
     <script>
+        // --- JavaScript logic remains the same ---
+        const leaderboardSelector = document.querySelector("#leaderboard-selector");
+        const skillSelector = document.querySelector("#skill-selector");
+        const tableBody = document.querySelector("#leaderboard-table tbody");
+        const updatedText = document.querySelector("#last-updated");
+        const title = document.querySelector("#leaderboard-title");
+
         async function fetchAndDisplayLeaderboard() {
-            const tableBody = document.querySelector("#leaderboard-table tbody");
-            const updatedText = document.querySelector("#last-updated");
-            tableBody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
+            const leaderboardType = leaderboardSelector.value;
+            const skill = skillSelector.value;
+
+            const leaderboardText = leaderboardSelector.options[leaderboardSelector.selectedIndex].text;
+            const skillText = skillSelector.options[skillSelector.selectedIndex].text;
+
+            title.textContent = `${leaderboardText} - ${skillText}`;
+            tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading...</td></tr>';
+            updatedText.textContent = 'Fetching data...';
 
             try {
-                const response = await fetch('/api/get-movements');
-                const data = await response.json(); // Data is now { movements: [], lastUpdated: '...' }
+                const response = await fetch(`/api/get-movements?leaderboardType=${leaderboardType}&skill=${skill}`);
+                const data = await response.json();
 
                 const players = data.movements;
                 const lastUpdated = data.lastUpdated;
 
-                // Display the last updated time
                 if (lastUpdated) {
-                    const date = new Date(lastUpdated);
-                    // Format the date to be more readable
-                    updatedText.textContent = `Last Updated: ${date.toLocaleString()}`;
+                    updatedText.textContent = `Last Updated: ${new Date(lastUpdated).toLocaleString()}`;
                 } else {
                     updatedText.textContent = 'No update time available.';
                 }
 
                 players.sort((a, b) => a.currentRank - b.currentRank);
-
                 tableBody.innerHTML = '';
 
                 if (players.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="3">No data available yet. Check back tomorrow!</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem;">No data available yet. Check back after the next daily update!</td></tr>';
                     return;
                 }
 
                 players.forEach(player => {
                     let movementText = player.movement;
-                    let movementClass = '';
+                    let movementClass = player.movement > 0 ? 'positive' : player.movement < 0 ? 'negative' : '';
+                    if (player.movement > 0) movementText = `+${player.movement}`;
 
-                    if (player.movement > 0) {
-                        movementText = `+${player.movement}`;
-                        movementClass = 'positive';
-                    } else if (player.movement < 0) {
-                        movementClass = 'negative';
-                    }
+                    let scoreDeltaText = player.scoreDelta.toLocaleString();
+                    let scoreDeltaClass = player.scoreDelta > 0 ? 'positive' : player.scoreDelta < 0 ? 'negative' : '';
+                    if (player.scoreDelta > 0) scoreDeltaText = `+${scoreDeltaText}`;
 
                     const row = `
                         <tr>
                             <td>${player.currentRank}</td>
                             <td>${player.username}</td>
                             <td class="${movementClass}">${movementText}</td>
+                            <td class="${scoreDeltaClass}">${scoreDeltaText}</td>
                         </tr>
                     `;
                     tableBody.innerHTML += row;
                 });
             } catch (error) {
-                tableBody.innerHTML = '<tr><td colspan="3">Failed to load data.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem;">Failed to load data.</td></tr>';
                 updatedText.textContent = 'Could not load update time.';
                 console.error("Error fetching leaderboard:", error);
             }
         }
 
+        leaderboardSelector.addEventListener('change', fetchAndDisplayLeaderboard);
+        skillSelector.addEventListener('change', fetchAndDisplayLeaderboard);
         fetchAndDisplayLeaderboard();
     </script>
 </body>

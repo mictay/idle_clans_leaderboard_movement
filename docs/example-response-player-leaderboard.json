@@ -1,0 +1,165 @@
+{
+    "username": "DerfRevrac",
+    "totalLevelResult": {
+        "totalLevel": 2110,
+        "score": 946577910.446478,
+        "rank": 192
+    },
+    "fields": {
+        "attack": {
+            "score": 20121540,
+            "rank": 268,
+            "expCapDate": 0
+        },
+        "strength": {
+            "score": 19898165,
+            "rank": 317,
+            "expCapDate": 0
+        },
+        "defence": {
+            "score": 20152825,
+            "rank": 291,
+            "expCapDate": 0
+        },
+        "archery": {
+            "score": 14010818,
+            "rank": 235,
+            "expCapDate": 0
+        },
+        "magic": {
+            "score": 12869735,
+            "rank": 343,
+            "expCapDate": 0
+        },
+        "health": {
+            "score": 22673199,
+            "rank": 310,
+            "expCapDate": 0
+        },
+        "crafting": {
+            "score": 9525512,
+            "rank": 310,
+            "expCapDate": 0
+        },
+        "woodcutting": {
+            "score": 17301208,
+            "rank": 294,
+            "expCapDate": 0
+        },
+        "carpentry": {
+            "score": 15041508,
+            "rank": 309,
+            "expCapDate": 0
+        },
+        "fishing": {
+            "score": 20329052,
+            "rank": 318,
+            "expCapDate": 0
+        },
+        "cooking": {
+            "score": 48561930,
+            "rank": 213,
+            "expCapDate": 0
+        },
+        "mining": {
+            "score": 44447929,
+            "rank": 161,
+            "expCapDate": 0
+        },
+        "smithing": {
+            "score": 19956347,
+            "rank": 210,
+            "expCapDate": 0
+        },
+        "foraging": {
+            "score": 70799253,
+            "rank": 39,
+            "expCapDate": 0
+        },
+        "farming": {
+            "score": 16472742,
+            "rank": 194,
+            "expCapDate": 0
+        },
+        "agility": {
+            "score": 16810766,
+            "rank": 319,
+            "expCapDate": 0
+        },
+        "plundering": {
+            "score": 500000000,
+            "rank": 5,
+            "expCapDate": 638943565051474176
+        },
+        "enchanting": {
+            "score": 36925828,
+            "rank": 158,
+            "expCapDate": 0
+        },
+        "brewing": {
+            "score": 14905872,
+            "rank": 183,
+            "expCapDate": 0
+        },
+        "exterminating": {
+            "score": 5773671,
+            "rank": 244,
+            "expCapDate": 0
+        },
+        "chimera": {
+            "score": 395,
+            "rank": 122,
+            "expCapDate": 0
+        },
+        "devil": {
+            "score": 139,
+            "rank": 325,
+            "expCapDate": 0
+        },
+        "griffin": {
+            "score": 108,
+            "rank": 353,
+            "expCapDate": 0
+        },
+        "hades": {
+            "score": 105,
+            "rank": 316,
+            "expCapDate": 0
+        },
+        "medusa": {
+            "score": 85,
+            "rank": 398,
+            "expCapDate": 0
+        },
+        "zeus": {
+            "score": 126,
+            "rank": 337,
+            "expCapDate": 0
+        },
+        "sobek": {
+            "score": 143,
+            "rank": 2,
+            "expCapDate": 0
+        },
+        "reckoning_of_the_gods": {
+            "score": 15,
+            "rank": 394,
+            "expCapDate": 0
+        },
+        "guardians_of_the_citadel": {
+            "score": 36,
+            "rank": 215,
+            "expCapDate": 0
+        },
+        "skeleton_warrior": {
+            "score": 87,
+            "rank": 112,
+            "expCapDate": 0
+        },
+        "bloodmoon_massacre": {
+            "score": 21,
+            "rank": 118,
+            "expCapDate": 0
+        }
+    }
+}
