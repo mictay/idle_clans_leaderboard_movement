@@ -1,0 +1,23 @@
+{
+  "name": "idle_clans_leaderboard_movement",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/mictay/idle_clans_leaderboard_movement#readme",
+  "bugs": {
+    "url": "https://github.com/mictay/idle_clans_leaderboard_movement/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mictay/idle_clans_leaderboard_movement.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@vercel/kv": "^3.0.0"
+  }
+}

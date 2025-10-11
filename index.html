@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle Clans Leaderboard Movement</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; color: #1c1e21; }
+        table { width: 80%; margin: 2rem auto; border-collapse: collapse; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #e9ecef; }
+        .positive { color: green; }
+        .negative { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Idle Clans Daily Leaderboard Movement</h1>
+    <table id="leaderboard-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Movement (24h)</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+
+    <script>
+        async function fetchAndDisplayLeaderboard() {
+            const tableBody = document.querySelector("#leaderboard-table tbody");
+            tableBody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
+
+            try {
+                const response = await fetch('/api/get-movements');
+                const players = await response.json();
+
+                // Sort players by their current rank
+                players.sort((a, b) => a.currentRank - b.currentRank);
+
+                tableBody.innerHTML = ''; // Clear loading message
+
+                if (players.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="3">No data available yet. Check back tomorrow!</td></tr>';
+                    return;
+                }
+
+                players.forEach(player => {
+                    let movementText = player.movement;
+                    let movementClass = '';
+
+                    if (player.movement > 0) {
+                        movementText = `+${player.movement}`;
+                        movementClass = 'positive';
+                    } else if (player.movement < 0) {
+                        movementClass = 'negative';
+                    }
+
+                    const row = `
+                        <tr>
+                            <td>${player.currentRank}</td>
+                            <td>${player.username}</td>
+                            <td class="${movementClass}">${movementText}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                tableBody.innerHTML = '<tr><td colspan="3">Failed to load data.</td></tr>';
+                console.error("Error fetching leaderboard:", error);
+            }
+        }
+
+        // Fetch data when the page loads
+        fetchAndDisplayLeaderboard();
+    </script>
+</body>
+</html>
