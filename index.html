@@ -192,6 +192,7 @@
     <div class="container">
         <header>
             <h1 class="main-title">Idle Clans Daily Leaderboard Rank Movement</h1>
+            <h2 id="leaderboard-title"></h2>
             <p id="last-updated">Loading all data, this may take a moment...</p>
         </header>
 
@@ -253,7 +254,6 @@
         </nav>
 
         <div id="leaderboard-view" class="view active">
-            <h2 id="leaderboard-title"></h2>
             <div class="table-wrapper">
                 <table id="leaderboard-table">
                     <thead>
@@ -403,7 +403,7 @@
                 scoreDurationSpan.textContent = durationText;
 
                 sortData();
-                renderTable();
+                renderLeaderboardTable(); // CORRECTED FUNCTION NAME
                 updateSortIndicators();
             }
 
@@ -461,7 +461,7 @@
                         currentSortDirection = 'asc';
                     }
                     sortData();
-                    renderTable();
+                    renderLeaderboardTable(); // CORRECTED FUNCTION NAME
                     updateSortIndicators();
                 });
             });
