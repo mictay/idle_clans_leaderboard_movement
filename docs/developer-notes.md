@@ -74,3 +74,16 @@ bloodmoon_massacre
 - - To start from the beginning: https://your-site.vercel.app/api/update-leaderboard
 - - To skip the first 14 and start at the 15th leaderboard (index 14): https://your-site.vercel.app/api/update-leaderboard?startIndex=14
 - - To restart from the 50th leaderboard (index 49): https://your-site.vercel.app/api/update-leaderboard?startIndex=49
+
+# Running the Cron job locall
+Terminal 1
+```
+vercel dev
+```
+
+Terminal 2 (powershell)
+```
+Invoke-WebRequest http://localhost:3000/api/update-leaderboard?startIndex=0 -TimeoutSec 1800
+```
+
+terminal 2 may time out, just update the startIndex=0 to the last successful index
