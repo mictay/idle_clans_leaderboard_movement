@@ -3,11 +3,15 @@
         {
             "path": "/api/update-leaderboard?cron_secret=${CRON_SECRET}",
             "schedule": "0 0 * * *"
+        },
+        {
+            "path": "/api/calculate-top-movers?cron_secret=${CRON_SECRET}",
+            "schedule": "15 0 * * *"
         }
     ],
     "headers": [
         {
-            "source": "/api/get-movements",
+            "source": "/api/get-all-movements",
             "headers": [
                 {
                     "key": "Access-Control-Allow-Origin",
