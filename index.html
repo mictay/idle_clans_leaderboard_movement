@@ -37,17 +37,28 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        #leaderboard-title {
+        /* UPDATED: Styles for new H1 and H2 */
+        .main-title {
             color: var(--header-color);
             font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        #leaderboard-title {
+            color: var(--header-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            text-align: center;
         }
         #last-updated {
             color: #718096;
             margin-top: 0;
             margin-bottom: 2rem;
             font-style: italic;
+            text-align: center;
         }
         .controls {
             display: flex;
@@ -108,12 +119,17 @@
         .negative {
             color: var(--negative-color);
         }
+        /* UPDATED: Footer styles for multiple paragraphs */
         .site-footer {
             text-align: center;
             padding: 1rem;
             margin-top: 1rem;
             color: var(--footer-text-color);
             font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .site-footer p {
+            margin: 0.5rem 0;
         }
         .sortable {
             cursor: pointer;
@@ -137,8 +153,11 @@
             .control-group {
                 flex-grow: 1;
             }
-            #leaderboard-title {
+            .main-title {
                 font-size: 2.25rem;
+            }
+            #leaderboard-title {
+                font-size: 1.75rem;
             }
         }
     </style>
@@ -146,60 +165,13 @@
 <body>
     <div class="container">
         <header>
-            <h1 id="leaderboard-title">Idle Clans Daily Leaderboard</h1>
+            <h1 class="main-title">Idle Clans Daily Leaderboard Rank Movement</h1>
+            <h2 id="leaderboard-title"></h2>
             <p id="last-updated">Loading...</p>
         </header>
 
         <div class="controls">
-            <div class="control-group">
-                <label for="leaderboard-selector">Game Mode</label>
-                <select id="leaderboard-selector">
-                    <option value="groupironman" selected>Group Ironman</option>
-                    <option value="ironman">Ironman</option>
-                    <option value="default">Default</option>
-                </select>
             </div>
-            <div class="control-group">
-                <label for="skill-selector">Skill</label>
-                <select id="skill-selector">
-                    <option value="total_level" selected>Total Exp</option>
-                    <option value="smithing">Smithing</option>
-                    <option value="woodcutting">Woodcutting</option>
-                    <option value="crafting">Crafting</option>
-                    <option value="enchanting">Enchanting</option>
-                    <option value="farming">Farming</option>
-                    <option value="foraging">Foraging</option>
-                    <option value="carpentry">Carpentry</option>
-                    <option value="plundering">Plundering</option>
-                    <option value="mining">Mining</option>
-                    <option value="cooking">Cooking</option>
-                    <option value="brewing">Brewing</option>
-                    <option value="agility">Agility</option>
-                    <option value="fishing">Fishing</option>
-                    <option value="exterminating">Exterminating</option>
-                    <option value="attack">Attack</option>
-                    <option value="strength">Strength</option>
-                    <option value="magic">Magic</option>
-                    <option value="defence">Defence</option>
-                    <option value="archery">Archery</option>
-                    <option value="health">Health</option>
-                    <option value="zeus">Zeus</option>
-                    <option value="medusa">Medusa</option>
-                    <option value="hades">Hades</option>
-                    <option value="griffin">Griffin</option>
-                    <option value="devil">Devil</option>
-                    <option value="chimera">Chimera</option>
-                    <option value="sobek">Sobek</option>
-                    <option value="kronos">Kronos</option>
-                    <option value="malignant_spider">Malignant Spider</option>
-                    <option value="skeleton_warrior">Skeleton Warrior</option>
-                    <option value="otherworldly_golem">Otherworldly Golem</option>
-                    <option value="reckoning_of_the_gods">Reckoning Of The Gods</option>
-                    <option value="guardians_of_the_citadel">Guardians Of The Citadel</option>
-                    <option value="bloodmoon_massacre">Bloodmoon Massacre</option>
-                </select>
-            </div>
-        </div>
 
         <div class="table-wrapper">
             <table id="leaderboard-table">
@@ -219,6 +191,8 @@
 
     <footer class="site-footer">
         <p>This site is a fan site only and has no affiliation with Idle Clans.</p>
+        <p>This updates midnight UTC, and takes about 10 minutes due to api throttling rules.<br/>
+        I'm just a player like you, and if you have questions or suggestions, go to channel's discord #api-and-modding.</p>
     </footer>
 
     <script>
@@ -303,7 +277,10 @@
                 const skill = skillSelector.value;
                 const leaderboardText = leaderboardSelector.options[leaderboardSelector.selectedIndex].text;
                 const skillText = skillSelector.options[skillSelector.selectedIndex].text;
+
+                // Set initial text for the h2
                 title.textContent = `${leaderboardText} - ${skillText}`;
+
                 tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Loading...</td></tr>';
                 updatedText.textContent = 'Fetching data...';
                 try {
@@ -355,7 +332,7 @@
             });
 
             leaderboardSelector.addEventListener('change', fetchAndDisplayLeaderboard);
-            skillSelector.addEventListener('change', fetchAndDisplayLeaderboard);
+            skillSelector.addEventListener('change', fetchAndДDisplayLeaderboard);
 
             fetchAndDisplayLeaderboard();
         });
