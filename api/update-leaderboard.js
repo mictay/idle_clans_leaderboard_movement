@@ -1,6 +1,5 @@
 import { kv } from '@vercel/kv';
 
-// These lists define all the leaderboards to be processed.
 const LEADERBOARD_TYPES = ['default', 'ironman', 'groupironman'];
 const SKILLS = [
     'total_level', 'smithing', 'woodcutting', 'crafting', 'enchanting',
@@ -11,30 +10,19 @@ const SKILLS = [
     'kronos', 'malignant_spider', 'skeleton_warrior', 'otherworldly_golem',
     'reckoning_of_the_gods', 'guardians_of_the_citadel', 'bloodmoon_massacre'
 ];
-
-// Helper function to pause execution.
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-/**
- * Processes a single leaderboard, fetching data, calculating movements, and saving to KV.
- * This function is designed to be resilient, handling its own errors.
- * @param {string} leaderboardType - The game mode (e.g., 'groupironman').
- * @param {string} skill - The skill name (e.g., 'foraging').
- * @returns {Promise<object>} A result object indicating success or failure.
- */
 async function processLeaderboard(leaderboardType, skill) {
     const leaderboardName = `${leaderboardType}-${skill}`;
     const apiLeaderboardType = `players:${leaderboardType}`;
     const apiUrl = `https://query.idleclans.com/api/Leaderboard/top/${apiLeaderboardType}/${skill}`;
 
-    // Define all database keys for this leaderboard.
     const movementsKey = `leaderboard:movements:${leaderboardName}`;
     const lastUpdatedKey = `last-updated:${leaderboardName}`;
     const previousUpdatedKey = `previous-updated:${leaderboardName}`;
 
     try {
         const oldTimestamp = await kv.get(lastUpdatedKey);
-
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
             const reason = `API fetch failed with status: ${apiResponse.status}`;
@@ -43,7 +31,6 @@ async function processLeaderboard(leaderboardType, skill) {
         }
         const currentLeaderboard = await apiResponse.json();
 
-        // Clean up players who have dropped off the leaderboard.
         const currentPlayerUsernames = new Set(currentLeaderboard.map(p => p.username));
         const previousResults = await kv.get(movementsKey);
         const keysToDelete = [];
@@ -59,25 +46,19 @@ async function processLeaderboard(leaderboardType, skill) {
             await Promise.all(keysToDelete.map(key => kv.del(key)));
         }
 
-        // Process each player to calculate rank and exp changes.
         const movementResults = [];
         for (const [index, player] of currentLeaderboard.entries()) {
             const playerName = player.username;
             const playerRankKey = `${leaderboardName}:player:${playerName}`;
             const playerScoreKey = `${leaderboardName}:score:${playerName}`;
-
             const [oldRank, oldScore] = await kv.mget(playerRankKey, playerScoreKey);
-
             const movement = oldRank !== null ? oldRank - (index + 1) : 0;
             const scoreDelta = oldScore !== null ? player.score - oldScore : 0;
-
             movementResults.push({ username: playerName, currentRank: index + 1, movement, score: player.score, scoreDelta });
-
             await kv.set(playerRankKey, index + 1);
             await kv.set(playerScoreKey, player.score);
         }
 
-        // On success, save the main data and update timestamps.
         const currentTime = new Date().toISOString();
         await kv.set(movementsKey, movementResults);
         await kv.set(lastUpdatedKey, currentTime);
@@ -85,7 +66,6 @@ async function processLeaderboard(leaderboardType, skill) {
             await kv.set(previousUpdatedKey, oldTimestamp);
         }
 
-        // Return a success object including the processed data for the final analysis.
         return {
             leaderboard: leaderboardName,
             status: 'OK',
@@ -100,17 +80,12 @@ async function processLeaderboard(leaderboardType, skill) {
     }
 }
 
-/**
- * The main handler for the cron job.
- */
 export default async function handler(request, response) {
-    // Security check: Block unauthorized web access in production.
     const isDevelopment = process.env.NODE_ENV === 'development';
     if (!isDevelopment && request.query.cron_secret !== process.env.CRON_SECRET) {
         return response.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Generate the full list of all leaderboards to process.
     const allCombinations = [];
     for (const type of LEADERBOARD_TYPES) {
         for (const skill of SKILLS) {
@@ -118,7 +93,6 @@ export default async function handler(request, response) {
         }
     }
 
-    // Allow starting the job from a specific index for debugging.
     const startIndexRaw = request.query.startIndex;
     let startIndex = 0;
     if (startIndexRaw) {
@@ -129,13 +103,12 @@ export default async function handler(request, response) {
     }
 
     const chunkSize = 14;
-    const intervalInMs = 70000; // 70-second interval to respect API rate limits.
+    const intervalInMs = 70000;
     const allResults = [];
     const successfulLeaderboardsData = [];
 
     console.log(`Starting leaderboard processing. Total: ${allCombinations.length}. Starting from index: ${startIndex}.`);
 
-    // Process all leaderboards in throttled batches.
     for (let i = startIndex; i < allCombinations.length; i += chunkSize) {
         const batchStartTime = Date.now();
         const chunk = allCombinations.slice(i, i + chunkSize);
@@ -145,11 +118,16 @@ export default async function handler(request, response) {
             chunk.map(combo => processLeaderboard(combo.leaderboardType, combo.skill))
         );
 
+        // --- THIS IS THE CORRECTED SECTION ---
+        // We must iterate over the results of each batch and collect the data
+        // from the successful runs for the final analysis step.
         chunkResults.forEach(result => {
             if (result.status === 'OK' && result.data) {
                 successfulLeaderboardsData.push(result.data);
             }
         });
+        // --- End of correction ---
+
         allResults.push(...chunkResults);
 
         const elapsedTime = Date.now() - batchStartTime;
@@ -166,10 +144,10 @@ export default async function handler(request, response) {
         }
     }
 
-    // After all batches are done, calculate and save the Top 10 movers.
     console.log("Calculating Top 10 movers for each game mode...");
     for (const type of LEADERBOARD_TYPES) {
         const flatPlayerList = [];
+        // This filter will now work correctly because successfulLeaderboardsData is properly populated.
         const modeData = successfulLeaderboardsData.filter(d => d.leaderboardType === type);
 
         modeData.forEach(board => {
@@ -180,11 +158,9 @@ export default async function handler(request, response) {
             });
         });
 
-        // Save Top 10 Gainers
         flatPlayerList.sort((a, b) => b.movement - a.movement);
         await kv.set(`top-gainers:${type}`, flatPlayerList.slice(0, 10));
 
-        // Save Top 10 Losers
         flatPlayerList.sort((a, b) => a.movement - b.movement);
         await kv.set(`top-losers:${type}`, flatPlayerList.filter(p => p.movement < 0).slice(0, 10));
 
