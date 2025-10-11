@@ -22,7 +22,6 @@
             --hover-bg: #edf2f7;
             --footer-text-color: #718096;
         }
-
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
@@ -30,7 +29,6 @@
             margin: 0;
             padding: 1rem;
         }
-
         .container {
             max-width: 1024px;
             margin: 2rem auto;
@@ -39,38 +37,32 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-
         #leaderboard-title {
             color: var(--header-color);
             font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
-
         #last-updated {
             color: #718096;
             margin-top: 0;
             margin-bottom: 2rem;
             font-style: italic;
         }
-
         .controls {
             display: flex;
             flex-direction: column;
             gap: 1rem;
             margin-bottom: 2rem;
         }
-
         .control-group {
             display: flex;
             flex-direction: column;
         }
-
         .controls label {
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
-
         .controls select {
             padding: 0.75rem;
             font-size: 1rem;
@@ -80,27 +72,23 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24' 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
         }
-
         .table-wrapper {
             overflow-x: auto;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
         }
-
         th, td {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
         }
-
         th {
             font-weight: 600;
             text-transform: uppercase;
@@ -108,11 +96,9 @@
             letter-spacing: 0.05em;
             color: #718096;
         }
-
         tbody tr:hover {
             background-color: var(--hover-bg);
         }
-
         .positive, .negative {
             font-weight: 600;
         }
@@ -122,7 +108,6 @@
         .negative {
             color: var(--negative-color);
         }
-
         .site-footer {
             text-align: center;
             padding: 1rem;
@@ -130,12 +115,10 @@
             color: var(--footer-text-color);
             font-size: 0.875rem;
         }
-
-        /* --- NEW: Styles for Sortable Table Headers --- */
         .sortable {
             cursor: pointer;
             position: relative;
-            user-select: none; /* Prevents text selection on click */
+            user-select: none;
         }
         .sortable:hover {
             background-color: var(--hover-bg);
@@ -146,7 +129,6 @@
             margin-left: 0.5em;
             color: var(--primary-color);
         }
-
         @media (min-width: 768px) {
             .controls {
                 flex-direction: row;
@@ -180,7 +162,7 @@
             <div class="control-group">
                 <label for="skill-selector">Skill</label>
                 <select id="skill-selector">
-                    <option value="total_level" selected>Total Level</option>
+                    <option value="total_level" selected>Total Exp</option>
                     <option value="smithing">Smithing</option>
                     <option value="woodcutting">Woodcutting</option>
                     <option value="crafting">Crafting</option>
@@ -194,6 +176,27 @@
                     <option value="brewing">Brewing</option>
                     <option value="agility">Agility</option>
                     <option value="fishing">Fishing</option>
+                    <option value="exterminating">Exterminating</option>
+                    <option value="attack">Attack</option>
+                    <option value="strength">Strength</option>
+                    <option value="magic">Magic</option>
+                    <option value="defence">Defence</option>
+                    <option value="archery">Archery</option>
+                    <option value="health">Health</option>
+                    <option value="zeus">Zeus</option>
+                    <option value="medusa">Medusa</option>
+                    <option value="hades">Hades</option>
+                    <option value="griffin">Griffin</option>
+                    <option value="devil">Devil</option>
+                    <option value="chimera">Chimera</option>
+                    <option value="sobek">Sobek</option>
+                    <option value="kronos">Kronos</option>
+                    <option value="malignant_spider">Malignant Spider</option>
+                    <option value="skeleton_warrior">Skeleton Warrior</option>
+                    <option value="otherworldly_golem">Otherworldly Golem</option>
+                    <option value="reckoning_of_the_gods">Reckoning Of The Gods</option>
+                    <option value="guardians_of_the_citadel">Guardians Of The Citadel</option>
+                    <option value="bloodmoon_massacre">Bloodmoon Massacre</option>
                 </select>
             </div>
         </div>
@@ -204,8 +207,9 @@
                     <tr>
                         <th class="sortable" data-sort="currentRank">Rank <span class="sort-indicator"></span></th>
                         <th class="sortable" data-sort="username">Player <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-sort="movement">Rank Change (24h) <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-sort="scoreDelta">Score Change (24h) <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-sort="score">Score <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-sort="movement">Rank Change <span id="rank-change-duration">(Daily)</span> <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-sort="scoreDelta">Score Change <span id="score-change-duration">(Daily)</span> <span class="sort-indicator"></span></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -218,145 +222,143 @@
     </footer>
 
     <script>
-        const leaderboardSelector = document.querySelector("#leaderboard-selector");
-        const skillSelector = document.querySelector("#skill-selector");
-        const tableBody = document.querySelector("#leaderboard-table tbody");
-        const updatedText = document.querySelector("#last-updated");
-        const title = document.querySelector("#leaderboard-title");
+        document.addEventListener('DOMContentLoaded', () => {
+            const leaderboardSelector = document.querySelector("#leaderboard-selector");
+            const skillSelector = document.querySelector("#skill-selector");
+            const tableBody = document.querySelector("#leaderboard-table tbody");
+            const updatedText = document.querySelector("#last-updated");
+            const title = document.querySelector("#leaderboard-title");
+            const rankDurationSpan = document.querySelector("#rank-change-duration");
+            const scoreDurationSpan = document.querySelector("#score-change-duration");
 
-        // --- NEW: State variables for sorting ---
-        let currentPlayers = []; // Holds the fetched data
-        let currentSortColumn = 'currentRank'; // Default sort column
-        let currentSortDirection = 'asc'; // Default sort direction
+            let currentPlayers = [];
+            let currentSortColumn = 'currentRank';
+            let currentSortDirection = 'asc';
 
-        // --- NEW: Function to render the table from the currentPlayers array ---
-        function renderTable() {
-            tableBody.innerHTML = ''; // Clear existing rows
-
-            if (currentPlayers.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem;">No data available yet. Check back after the next daily update!</td></tr>';
-                return;
+            function formatDuration(last, previous) {
+                if (!last || !previous) return "(Daily)";
+                const lastDate = new Date(last);
+                const prevDate = new Date(previous);
+                const diffMs = lastDate.getTime() - prevDate.getTime();
+                if (diffMs <= 0) return "(Daily)";
+                const totalHours = diffMs / (1000 * 60 * 60);
+                const hours = Math.floor(totalHours);
+                const minutes = Math.round((totalHours - hours) * 60);
+                return `(${hours}h ${minutes}m)`;
             }
 
-            currentPlayers.forEach(player => {
-                let movementText = player.movement;
-                let movementClass = player.movement > 0 ? 'positive' : player.movement < 0 ? 'negative' : '';
-                if (player.movement > 0) movementText = `+${player.movement}`;
-
-                let scoreDeltaText = player.scoreDelta.toLocaleString();
-                let scoreDeltaClass = player.scoreDelta > 0 ? 'positive' : player.scoreDelta < 0 ? 'negative' : '';
-                if (player.scoreDelta > 0) scoreDeltaText = `+${scoreDeltaText}`;
-
-                const row = `
-                    <tr>
-                        <td>${player.currentRank}</td>
-                        <td>${player.username}</td>
-                        <td class="${movementClass}">${movementText}</td>
-                        <td class="${scoreDeltaClass}">${scoreDeltaText}</td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
-            });
-        }
-
-        // --- NEW: Function to handle sorting the data array ---
-        function sortData() {
-            currentPlayers.sort((a, b) => {
-                const valA = a[currentSortColumn];
-                const valB = b[currentSortColumn];
-
-                let comparison = 0;
-                if (typeof valA === 'string') {
-                    // Case-insensitive string comparison
-                    comparison = valA.localeCompare(valB, undefined, { sensitivity: 'base' });
-                } else {
-                    // Numeric comparison
-                    comparison = valA - valB;
+            function renderTable() {
+                tableBody.innerHTML = '';
+                if (currentPlayers.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">No data available yet. Check back after the next daily update!</td></tr>';
+                    return;
                 }
+                currentPlayers.forEach(player => {
+                    let movementText = player.movement;
+                    let movementClass = player.movement > 0 ? 'positive' : player.movement < 0 ? 'negative' : '';
+                    if (player.movement > 0) movementText = `+${player.movement}`;
+                    let scoreDeltaText = player.scoreDelta.toLocaleString();
+                    let scoreDeltaClass = player.scoreDelta > 0 ? 'positive' : player.scoreDelta < 0 ? 'negative' : '';
+                    if (player.scoreDelta > 0) scoreDeltaText = `+${scoreDeltaText}`;
+                    const row = `
+                        <tr>
+                            <td>${player.currentRank}</td>
+                            <td>${player.username}</td>
+                            <td>${player.score.toLocaleString()}</td>
+                            <td class="${movementClass}">${movementText}</td>
+                            <td class="${scoreDeltaClass}">${scoreDeltaText}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            }
 
-                // Reverse the comparison if direction is descending
-                return currentSortDirection === 'desc' ? comparison * -1 : comparison;
-            });
-        }
+            function sortData() {
+                currentPlayers.sort((a, b) => {
+                    const valA = a[currentSortColumn];
+                    const valB = b[currentSortColumn];
+                    let comparison = 0;
+                    if (typeof valA === 'string') {
+                        comparison = valA.localeCompare(valB, undefined, { sensitivity: 'base' });
+                    } else {
+                        comparison = valA - valB;
+                    }
+                    return currentSortDirection === 'desc' ? comparison * -1 : comparison;
+                });
+            }
 
-        // --- NEW: Function to update the arrows in the table headers ---
-        function updateSortIndicators() {
+            function updateSortIndicators() {
+                document.querySelectorAll('.sortable').forEach(header => {
+                    const indicator = header.querySelector('.sort-indicator');
+                    if (header.dataset.sort === currentSortColumn) {
+                        indicator.textContent = currentSortDirection === 'asc' ? '▲' : '▼';
+                    } else {
+                        indicator.textContent = '';
+                    }
+                });
+            }
+
+            async function fetchAndDisplayLeaderboard() {
+                const leaderboardType = leaderboardSelector.value;
+                const skill = skillSelector.value;
+                const leaderboardText = leaderboardSelector.options[leaderboardSelector.selectedIndex].text;
+                const skillText = skillSelector.options[skillSelector.selectedIndex].text;
+                title.textContent = `${leaderboardText} - ${skillText}`;
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Loading...</td></tr>';
+                updatedText.textContent = 'Fetching data...';
+                try {
+                    const response = await fetch(`/api/get-movements?leaderboardType=${leaderboardType}&skill=${skill}`);
+                    const data = await response.json();
+                    currentPlayers = data.movements;
+                    const lastUpdated = data.lastUpdated;
+                    const previousUpdated = data.previousUpdated;
+                    const durationText = formatDuration(lastUpdated, previousUpdated);
+                    rankDurationSpan.textContent = durationText;
+                    scoreDurationSpan.textContent = durationText;
+                    if (lastUpdated) {
+                        const lastDate = new Date(lastUpdated).toLocaleString();
+                        let displayText = `Last Updated: ${lastDate}`;
+                        if (previousUpdated) {
+                            const prevDate = new Date(previousUpdated).toLocaleString();
+                            displayText += ` (Previously: ${prevDate})`;
+                        }
+                        updatedText.textContent = displayText;
+                    } else {
+                        updatedText.textContent = 'No update time available.';
+                    }
+                    sortData();
+                    renderTable();
+                    updateSortIndicators();
+                } catch (error) {
+                    currentPlayers = [];
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Failed to load data.</td></tr>';
+                    updatedText.textContent = 'Could not load update time.';
+                    rankDurationSpan.textContent = "(Daily)";
+                    scoreDurationSpan.textContent = "(Daily)";
+                    console.error("Error fetching leaderboard:", error);
+                }
+            }
+
             document.querySelectorAll('.sortable').forEach(header => {
-                const indicator = header.querySelector('.sort-indicator');
-                if (header.dataset.sort === currentSortColumn) {
-                    indicator.textContent = currentSortDirection === 'asc' ? '▲' : '▼';
-                } else {
-                    indicator.textContent = ''; // Clear indicator for other columns
-                }
+                header.addEventListener('click', () => {
+                    const sortKey = header.dataset.sort;
+                    if (sortKey === currentSortColumn) {
+                        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSortColumn = sortKey;
+                        currentSortDirection = 'asc';
+                    }
+                    sortData();
+                    renderTable();
+                    updateSortIndicators();
+                });
             });
-        }
 
-        // --- MODIFIED: Main fetch function ---
-        async function fetchAndDisplayLeaderboard() {
-            const leaderboardType = leaderboardSelector.value;
-            const skill = skillSelector.value;
+            leaderboardSelector.addEventListener('change', fetchAndDisplayLeaderboard);
+            skillSelector.addEventListener('change', fetchAndDisplayLeaderboard);
 
-            const leaderboardText = leaderboardSelector.options[leaderboardSelector.selectedIndex].text;
-            const skillText = skillSelector.options[skillSelector.selectedIndex].text;
-
-            title.textContent = `${leaderboardText} - ${skillText}`;
-            tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading...</td></tr>';
-            updatedText.textContent = 'Fetching data...';
-
-            try {
-                const response = await fetch(`/api/get-movements?leaderboardType=${leaderboardType}&skill=${skill}`);
-                const data = await response.json();
-
-                // Store the fetched data in our local array
-                currentPlayers = data.movements;
-
-                const lastUpdated = data.lastUpdated;
-                if (lastUpdated) {
-                    updatedText.textContent = `Last Updated: ${new Date(lastUpdated).toLocaleString()}`;
-                } else {
-                    updatedText.textContent = 'No update time available.';
-                }
-
-                // Perform the initial sort, then render
-                sortData();
-                renderTable();
-                updateSortIndicators();
-
-            } catch (error) {
-                currentPlayers = []; // Clear data on error
-                renderTable(); // Render the empty/error state
-                updatedText.textContent = 'Could not load update time.';
-                console.error("Error fetching leaderboard:", error);
-            }
-        }
-
-        // --- NEW: Add click listeners to sortable headers ---
-        document.querySelectorAll('.sortable').forEach(header => {
-            header.addEventListener('click', () => {
-                const sortKey = header.dataset.sort;
-
-                if (sortKey === currentSortColumn) {
-                    // If clicking the same column, flip the direction
-                    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-                } else {
-                    // If clicking a new column, set it and default to ascending
-                    currentSortColumn = sortKey;
-                    currentSortDirection = 'asc';
-                }
-
-                // Re-sort the existing data, re-render the table, and update the indicators
-                sortData();
-                renderTable();
-                updateSortIndicators();
-            });
+            fetchAndDisplayLeaderboard();
         });
-
-        // Event listeners for dropdowns
-        leaderboardSelector.addEventListener('change', fetchAndDisplayLeaderboard);
-        skillSelector.addEventListener('change', fetchAndDisplayLeaderboard);
-
-        // Initial data load
-        fetchAndDisplayLeaderboard();
     </script>
 </body>
 </html>

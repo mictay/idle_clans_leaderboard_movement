@@ -15,6 +15,10 @@ vercel dev
 ```
 This will run the project on http://localhost:3000
 
+# Upstash
+
+leaderboard:movements*
+
 # Idle Clans
 api docs:  https://query.idleclans.com/api-docs/index.html
 
@@ -38,3 +42,35 @@ cooking
 brewing
 agility
 fishing
+agility
+exterminating
+attack
+strength
+magic
+defence
+archery
+health
+zeus
+medusa
+hades
+griffin
+devil
+chimera
+sobek
+kronos
+malignant_spider
+skeleton_warrior
+otherworldly_golem
+reckoning_of_the_gods
+guardians_of_the_citadel
+bloodmoon_massacre
+
+
+# API - update-leaderboard
+
+- Normal Cron Job: Your vercel.json file does not need to change. The cron will continue to call /api/update-leaderboard without parameters, so startIndex will default to 0 and the job will run from the beginning.
+
+- Manual Trigger (Local or Deployed): To start from a specific point, you can now add the query parameter to the URL in your browser or with curl.
+- - To start from the beginning: https://your-site.vercel.app/api/update-leaderboard
+- - To skip the first 14 and start at the 15th leaderboard (index 14): https://your-site.vercel.app/api/update-leaderboard?startIndex=14
+- - To restart from the 50th leaderboard (index 49): https://your-site.vercel.app/api/update-leaderboard?startIndex=49

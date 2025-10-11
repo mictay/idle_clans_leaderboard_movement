@@ -1,35 +1,37 @@
 import { kv } from '@vercel/kv';
 
-// --- No changes to constants or the sleep function ---
 const LEADERBOARD_TYPES = ['default', 'ironman', 'groupironman'];
 const SKILLS = [
     'total_level', 'smithing', 'woodcutting', 'crafting', 'enchanting',
     'farming', 'foraging', 'carpentry', 'plundering', 'mining',
-    'cooking', 'brewing', 'agility', 'fishing'
+    'cooking', 'brewing', 'agility', 'fishing', 'exterminating',
+    'attack', 'strength', 'magic', 'defence', 'archery', 'health',
+    'zeus', 'medusa', 'hades', 'griffin', 'devil', 'chimera', 'sobek',
+    'kronos', 'malignant_spider', 'skeleton_warrior', 'otherworldly_golem',
+    'reckoning_of_the_gods', 'guardians_of_the_citadel', 'bloodmoon_massacre'
 ];
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// --- UPDATED: processLeaderboard function is now wrapped in a try...catch block ---
 async function processLeaderboard(leaderboardType, skill) {
     const leaderboardName = `${leaderboardType}-${skill}`;
     const apiLeaderboardType = `players:${leaderboardType}`;
     const apiUrl = `https://query.idleclans.com/api/Leaderboard/top/${apiLeaderboardType}/${skill}`;
 
-    // This try...catch block ensures that an error for one skill does not stop the others.
+    const movementsKey = `leaderboard:movements:${leaderboardName}`;
+    const lastUpdatedKey = `last-updated:${leaderboardName}`;
+    const previousUpdatedKey = `previous-updated:${leaderboardName}`;
+
     try {
-        const movementsKey = `leaderboard:movements:${leaderboardName}`;
-        const lastUpdatedKey = `last-updated:${leaderboardName}`;
+        const oldTimestamp = await kv.get(lastUpdatedKey);
 
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
-            // This is a "soft" failure. We log it and return, preventing a crash.
             const reason = `API fetch failed with status: ${apiResponse.status}`;
             console.error(`Failed to process ${leaderboardName}: ${reason}`);
             return { leaderboard: leaderboardName, status: 'error', reason };
         }
         const currentLeaderboard = await apiResponse.json();
 
-        // Cleanup Logic
         const currentPlayerUsernames = new Set(currentLeaderboard.map(p => p.username));
         const previousResults = await kv.get(movementsKey);
         const keysToDelete = [];
@@ -45,7 +47,6 @@ async function processLeaderboard(leaderboardType, skill) {
             await Promise.all(keysToDelete.map(key => kv.del(key)));
         }
 
-        // Processing Logic
         const movementResults = [];
         for (const [index, player] of currentLeaderboard.entries()) {
             const playerName = player.username;
@@ -62,22 +63,35 @@ async function processLeaderboard(leaderboardType, skill) {
             await kv.set(playerScoreKey, currentScore);
         }
 
-        // CRITICAL: The timestamp is only written here, at the end of a SUCCESSFUL process.
         const currentTime = new Date().toISOString();
         await kv.set(movementsKey, movementResults);
         await kv.set(lastUpdatedKey, currentTime);
 
+        if (oldTimestamp) {
+            await kv.set(previousUpdatedKey, oldTimestamp);
+        }
+
         return { leaderboard: leaderboardName, status: 'OK', processed: movementResults.length, deleted: keysToDelete.length / 2 };
 
     } catch (error) {
-        // This catches any unexpected errors (e.g., from KV, JSON parsing, etc.)
         console.error(`An unexpected error occurred while processing ${leaderboardName}:`, error);
         return { leaderboard: leaderboardName, status: 'error', reason: error.message };
     }
 }
 
-// --- The main handler logic remains the same, but is now more resilient ---
 export default async function handler(request, response) {
+
+    // --- UPDATED: Security Check ---
+    // Allow requests to pass only if the secret in the query parameter is correct
+    // OR if we are in a local development environment (for easy testing).
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const { cron_secret } = request.query;
+
+    if (!isDevelopment && cron_secret !== process.env.CRON_SECRET) {
+        return response.status(401).json({ error: 'Unauthorized' });
+    }
+    // --- End of Security Check ---
+
     const allCombinations = [];
     for (const type of LEADERBOARD_TYPES) {
         for (const skill of SKILLS) {
@@ -85,26 +99,46 @@ export default async function handler(request, response) {
         }
     }
 
+    // --- RE-ADDED: Read and validate the startIndex from the query string ---
+    const startIndexRaw = request.query.startIndex;
+    let startIndex = 0; // Default to 0 if no parameter is passed
+
+    if (startIndexRaw) {
+        const parsedIndex = parseInt(startIndexRaw, 10);
+        if (!isNaN(parsedIndex) && parsedIndex >= 0) {
+            startIndex = parsedIndex;
+        }
+    }
+
     const chunkSize = 14;
-    const delayInMs = 60000;
+    const intervalInMs = 70000;
     const allResults = [];
 
-    console.log(`Starting leaderboard processing. Total: ${allCombinations.length} leaderboards in chunks of ${chunkSize}.`);
+    console.log(`Starting leaderboard processing. Total: ${allCombinations.length} leaderboards. Starting from index: ${startIndex}.`);
 
-    for (let i = 0; i < allCombinations.length; i += chunkSize) {
+    // --- RE-ADDED: The loop now starts from our validated startIndex ---
+    for (let i = startIndex; i < allCombinations.length; i += chunkSize) {
+        const batchStartTime = Date.now();
         const chunk = allCombinations.slice(i, i + chunkSize);
-        console.log(`Processing batch #${(i / chunkSize) + 1}...`);
+        console.log(`Processing batch starting at index ${i}...`);
 
-        // Because processLeaderboard now handles its own errors, Promise.all will not fail fast.
         const chunkResults = await Promise.all(
             chunk.map(combo => processLeaderboard(combo.leaderboardType, combo.skill))
         );
         allResults.push(...chunkResults);
-        console.log(`Batch #${(i / chunkSize) + 1} complete.`);
+
+        const batchEndTime = Date.now();
+        const elapsedTime = batchEndTime - batchStartTime;
+        console.log(`Batch complete. Took ${elapsedTime}ms.`);
 
         if (i + chunkSize < allCombinations.length) {
-            console.log(`Waiting for ${delayInMs / 1000} seconds before next batch...`);
-            await sleep(delayInMs);
+            const waitTime = intervalInMs - elapsedTime;
+            if (waitTime > 0) {
+                console.log(`Waiting for ${waitTime}ms before next batch...`);
+                await sleep(waitTime);
+            } else {
+                console.log(`Batch took longer than interval. Proceeding immediately.`);
+            }
         }
     }
 

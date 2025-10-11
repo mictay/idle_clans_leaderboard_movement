@@ -1,8 +1,23 @@
 {
     "crons": [
         {
-            "path": "/api/update-leaderboard",
+            "path": "/api/update-leaderboard?cron_secret=${CRON_SECRET}",
             "schedule": "0 0 * * *"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/api/get-movements",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "https://${VERCEL_URL}"
+                },
+                {
+                    "key": "Vary",
+                    "value": "Origin"
+                }
+            ]
         }
     ]
 }
