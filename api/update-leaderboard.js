@@ -90,9 +90,11 @@ export default async function handler(request, response) {
     // Security check: Block unauthorized web access in production.
     const isDevelopment = process.env.NODE_ENV === 'development';
 
-    const authHeader = request.headers.get('authorization');
-    if (!isDevelopment && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-        return response.status(401).json({ error: 'Unauthorized' });
+    if (!isDevelopment) {
+        const authHeader = request.headers && typeof request.headers.get === "function" ? request.headers.get('authorization') : null;
+        if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+            return response.status(401).json({ error: 'Unauthorized' });
+        }
     }
 
     // Generate the full list of all leaderboards to process.
@@ -113,16 +115,28 @@ export default async function handler(request, response) {
         }
     }
 
+    // --- NEW: Allow stopping the job at a specific index ---
+    const stopIndexRaw = request.query.stopIndex;
+    let stopIndex = allCombinations.length; // Default to the end of the list
+    if (stopIndexRaw) {
+        const parsedIndex = parseInt(stopIndexRaw, 10);
+        // Use the provided stop index if it's a valid number, but don't exceed the total length
+        if (!isNaN(parsedIndex) && parsedIndex > startIndex) {
+            stopIndex = Math.min(parsedIndex, allCombinations.length);
+        }
+    }
+
     const chunkSize = 14;
     const intervalInMs = 70000; // 70-second interval to respect API rate limits.
     const allResults = [];
 
-    console.log(`Starting leaderboard processing. Total: ${allCombinations.length}. Starting from index: ${startIndex}.`);
+    console.log(`Starting leaderboard processing. Total: ${allCombinations.length}. Processing from index ${startIndex} to ${stopIndex}.`);
 
-    // Process all leaderboards in throttled batches.
-    for (let i = startIndex; i < allCombinations.length; i += chunkSize) {
+    // --- UPDATED: Loop now respects the stopIndex ---
+    for (let i = startIndex; i < stopIndex; i += chunkSize) {
         const batchStartTime = Date.now();
-        const chunk = allCombinations.slice(i, i + chunkSize);
+        // Adjust chunk to not go past the stopIndex
+        const chunk = allCombinations.slice(i, Math.min(i + chunkSize, stopIndex));
         console.log(`Processing batch starting at index ${i}...`);
 
         const chunkResults = await Promise.all(
@@ -133,7 +147,8 @@ export default async function handler(request, response) {
         const elapsedTime = Date.now() - batchStartTime;
         console.log(`Batch complete. Took ${elapsedTime}ms.`);
 
-        if (i + chunkSize < allCombinations.length) {
+        // --- UPDATED: Delay condition also respects stopIndex ---
+        if (i + chunkSize < stopIndex) {
             const waitTime = intervalInMs - elapsedTime;
             if (waitTime > 0) {
                 console.log(`Waiting for ${waitTime}ms before next batch...`);

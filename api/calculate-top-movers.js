@@ -6,9 +6,11 @@ export default async function handler(request, response) {
     // Secure this endpoint just like the other one.
     const isDevelopment = process.env.NODE_ENV === 'development';
 
-    const authHeader = request.headers.get('authorization');
-    if (!isDevelopment && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-        return response.status(401).json({ error: 'Unauthorized' });
+    if (!isDevelopment) {
+        const authHeader = request.headers && typeof request.headers.get === "function" ? request.headers.get('authorization') : null;
+        if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+            return response.status(401).json({ error: 'Unauthorized' });
+        }
     }
 
     console.log("Starting Top 10 movers calculation...");
