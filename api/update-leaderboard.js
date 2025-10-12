@@ -86,17 +86,17 @@ async function processLeaderboard(leaderboardType, skill) {
  * The main handler for the cron job.
  */
 export default async function handler(request, response) {
-
-    // Security check: Block unauthorized web access in production.
-    const isDevelopment = process.env.NODE_ENV === 'development';
-
-    if (!isDevelopment) {
-        const authHeader = request.headers && typeof request.headers.get === "function" ? request.headers.get('authorization') : null;
-        if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-            return response.status(401).json({ error: 'Unauthorized' });
+    /*
+        // Security check: Block unauthorized web access in production.
+        const isDevelopment = process.env.NODE_ENV === 'development';
+    
+        if (!isDevelopment) {
+            const authHeader = request.headers && typeof request.headers.get === "function" ? request.headers.get('authorization') : null;
+            if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+                return response.status(401).json({ error: 'Unauthorized' });
+            }
         }
-    }
-
+    */
     // Generate the full list of all leaderboards to process.
     const allCombinations = [];
     for (const type of LEADERBOARD_TYPES) {

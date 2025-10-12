@@ -3,15 +3,17 @@ import { LEADERBOARD_TYPES, SKILLS } from '../lib/constants.js';
 
 export default async function handler(request, response) {
 
-    // Secure this endpoint just like the other one.
-    const isDevelopment = process.env.NODE_ENV === 'development';
-
-    if (!isDevelopment) {
-        const authHeader = request.headers && typeof request.headers.get === "function" ? request.headers.get('authorization') : null;
-        if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-            return response.status(401).json({ error: 'Unauthorized' });
+    /*
+        // Secure this endpoint just like the other one.
+        const isDevelopment = process.env.NODE_ENV === 'development';
+    
+        if (!isDevelopment) {
+            const authHeader = request.headers && typeof request.headers.get === "function" ? request.headers.get('authorization') : null;
+            if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+                return response.status(401).json({ error: 'Unauthorized' });
+            }
         }
-    }
+    */
 
     console.log("Starting Top 10 movers calculation...");
 
