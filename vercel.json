@@ -1,11 +1,11 @@
 {
     "crons": [
         {
-            "path": "/api/update-leaderboard?cron_secret=${CRON_SECRET}",
+            "path": "/api/update-leaderboard",
             "schedule": "0 0 * * *"
         },
         {
-            "path": "/api/calculate-top-movers?cron_secret=${CRON_SECRET}",
+            "path": "/api/calculate-top-movers",
             "schedule": "15 0 * * *"
         }
     ],

@@ -2,9 +2,12 @@ import { kv } from '@vercel/kv';
 import { LEADERBOARD_TYPES, SKILLS } from '../lib/constants.js';
 
 export default async function handler(request, response) {
+
     // Secure this endpoint just like the other one.
     const isDevelopment = process.env.NODE_ENV === 'development';
-    if (!isDevelopment && request.query.cron_secret !== process.env.CRON_SECRET) {
+
+    const authHeader = request.headers.get('authorization');
+    if (!isDevelopment && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
         return response.status(401).json({ error: 'Unauthorized' });
     }
 
