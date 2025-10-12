@@ -1,12 +1,16 @@
 {
     "crons": [
         {
-            "path": "/api/update-leaderboard?startIndex=0&stopIndex=56",
+            "path": "/api/update-leaderboard?startIndex=0&stopIndex=42",
             "schedule": "0 0 * * *"
         },
         {
+            "path": "/api/update-leaderboard?startIndex=43&stopIndex=69",
+            "schedule": "10 0 * * *"
+        },
+        {
             "path": "/api/update-leaderboard?startIndex=70",
-            "schedule": "15 0 * * *"
+            "schedule": "20 0 * * *"
         },
         {
             "path": "/api/calculate-top-movers",
