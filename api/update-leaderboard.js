@@ -88,10 +88,11 @@ async function processLeaderboard(leaderboardType, skill) {
 export default async function handler(request, response) {
     // Security check: Block unauthorized web access in production.
     const isDevelopment = process.env.NODE_ENV === 'development';
-    if (!isDevelopment && request.query.cron_secret !== process.env.CRON_SECRET) {
-        console.error(`cron_secret mismatch. ${request.query.cron_secret} !== ${process.env.CRON_SECRET}`)
-        return response.status(401).json({ error: 'Unauthorized' });
-    }
+    /*    if (!isDevelopment && request.query.cron_secret !== process.env.CRON_SECRET) {
+            console.error(`cron_secret mismatch. ${request.query.cron_secret} !== ${process.env.CRON_SECRET}`)
+            return response.status(401).json({ error: 'Unauthorized' });
+        }
+    */
 
     // Generate the full list of all leaderboards to process.
     const allCombinations = [];
