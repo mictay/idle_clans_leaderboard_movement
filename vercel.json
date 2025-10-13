@@ -47,50 +47,6 @@
         {
             "path": "/api/calculate-top-movers",
             "schedule": "40 0 * * *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=players&startIndex=0&stopIndex=29&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=players&startIndex=29&stopIndex=57&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=players&startIndex=57&stopIndex=85&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=players&startIndex=85&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=clans&startIndex=0&stopIndex=29&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=clans&startIndex=29&stopIndex=57&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=clans&startIndex=57&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=pets&startIndex=0&stopIndex=29&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=pets&startIndex=29&stopIndex=57&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=pets&startIndex=57&env=preview",
-            "schedule": "0 0 28 2 *"
-        },
-        {
-            "path": "/api/calculate-top-movers?env=preview",
-            "schedule": "0 0 28 2 *"
         }
     ],
     "headers": [
