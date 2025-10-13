@@ -38,39 +38,39 @@
         },
         {
             "path": "/api/update-leaderboard?entityType=players&startIndex=0&stopIndex=42&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         },
         {
             "path": "/api/update-leaderboard?entityType=players&startIndex=43&stopIndex=69&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         },
         {
             "path": "/api/update-leaderboard?entityType=players&startIndex=70&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         },
         {
             "path": "/api/update-leaderboard?entityType=clans&startIndex=0&stopIndex=42&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         },
         {
             "path": "/api/update-leaderboard?entityType=clans&startIndex=43&stopIndex=69&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         },
         {
             "path": "/api/update-leaderboard?entityType=clans&startIndex=70&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         },
         {
             "path": "/api/update-leaderboard?entityType=pets&startIndex=0&stopIndex=42&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         },
         {
             "path": "/api/update-leaderboard?entityType=pets&startIndex=43&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         },
         {
             "path": "/api/calculate-top-movers&env=preview",
-            "schedule": "0 0 29 2 ?"
+            "schedule": "0 0 28 2 *"
         }
     ],
     "headers": [
