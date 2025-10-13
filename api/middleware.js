@@ -24,5 +24,5 @@ export function middleware(request) {
 
 // This configures the middleware to run ONLY on requests to your get-movements API.
 export const config = {
-    matcher: '/api/get-movements',
+    matcher: '/api/get-all-movements',
 };

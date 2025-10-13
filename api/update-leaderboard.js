@@ -1,5 +1,5 @@
 import { kv } from '@vercel/kv';
-import { LEADERBOARD_TYPES, SKILLS } from '../lib/constants.js';
+import { ENTITY_TYPES, LEADERBOARD_TYPES, PLAYERS_AND_CLANS_SKILLS, PET_SKILLS } from '../lib/constants.js';
 
 // Helper function to pause execution.
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -7,16 +7,20 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 /**
  * Processes a single leaderboard, fetching data, calculating movements, and saving to KV.
  * This function is designed to be resilient, handling its own errors.
+ * @param {string} entityType - The entity type (e.g., 'players').
  * @param {string} leaderboardType - The game mode (e.g., 'groupironman').
  * @param {string} skill - The skill name (e.g., 'foraging').
+ * @param {string} env - The environment prefix for database keys.
  * @returns {Promise<object>} A result object indicating success or failure.
  */
-async function processLeaderboard(leaderboardType, skill) {
-    const leaderboardName = `${leaderboardType}-${skill}`;
-    const apiLeaderboardType = `players:${leaderboardType}`;
-    const apiUrl = `https://query.idleclans.com/api/Leaderboard/top/${apiLeaderboardType}/${skill}`;
+async function processLeaderboard(entityType, leaderboardType, skill, env) {
+    const baseLeaderboardName = `${entityType}-${leaderboardType}-${skill}`;
+    // All keys are now prefixed with the environment
+    const leaderboardName = `${env}:${baseLeaderboardName}`;
 
-    // Define all database keys for this leaderboard.
+    const apiEntityType = `${entityType}:${leaderboardType}`;
+    const apiUrl = `https://query.idleclans.com/api/Leaderboard/top/${apiEntityType}/${skill}`;
+
     const movementsKey = `leaderboard:movements:${leaderboardName}`;
     const lastUpdatedKey = `last-updated:${leaderboardName}`;
     const previousUpdatedKey = `previous-updated:${leaderboardName}`;
@@ -27,8 +31,8 @@ async function processLeaderboard(leaderboardType, skill) {
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
             const reason = `API fetch failed with status: ${apiResponse.status}`;
-            console.error(`Failed to process ${leaderboardName}: ${reason}`);
-            return { leaderboard: leaderboardName, status: 'error', reason };
+            console.error(`Failed to process ${baseLeaderboardName}: ${reason}`);
+            return { leaderboard: baseLeaderboardName, status: 'error', reason };
         }
         const currentLeaderboard = await apiResponse.json();
 
@@ -74,11 +78,10 @@ async function processLeaderboard(leaderboardType, skill) {
             await kv.set(previousUpdatedKey, oldTimestamp);
         }
 
-        return { leaderboard: leaderboardName, status: 'OK' };
-
+        return { leaderboard: baseLeaderboardName, status: 'OK' };
     } catch (error) {
-        console.error(`An unexpected error occurred while processing ${leaderboardName}:`, error);
-        return { leaderboard: leaderboardName, status: 'error', reason: error.message };
+        console.error(`An unexpected error occurred while processing ${baseLeaderboardName}:`, error);
+        return { leaderboard: baseLeaderboardName, status: 'error', reason: error.message };
     }
 }
 
@@ -86,26 +89,36 @@ async function processLeaderboard(leaderboardType, skill) {
  * The main handler for the cron job.
  */
 export default async function handler(request, response) {
-    /*
-        // Security check: Block unauthorized web access in production.
-        const isDevelopment = process.env.NODE_ENV === 'development';
-    
-        if (!isDevelopment) {
-            const authHeader = request.headers && typeof request.headers.get === "function" ? request.headers.get('authorization') : null;
-            if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-                return response.status(401).json({ error: 'Unauthorized' });
-            }
-        }
-    */
-    // Generate the full list of all leaderboards to process.
+    // Security check: Block unauthorized web access in production.
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    // if (!isDevelopment) {
+    //     const authHeader = request.headers.get('authorization');
+    //     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    //         return response.status(401).json({ error: 'Unauthorized' });
+    //     }
+    // }
+
+    // Determine the environment prefix.
+    const requestedEnv = request.query.env;
+    const env = requestedEnv || process.env.VERCEL_ENV || 'development';
+
+
+    // Validate the entityType from the query string.
+    const entityType = request.query.entityType;
+    if (!entityType || !ENTITY_TYPES.includes(entityType)) {
+        return response.status(400).json({ error: 'Invalid or missing entityType parameter.' });
+    }
+
+    // Generate the list of tasks ONLY for the specified entityType.
     const allCombinations = [];
+    const skills = (entityType === 'pets') ? PET_SKILLS : PLAYERS_AND_CLANS_SKILLS;
     for (const type of LEADERBOARD_TYPES) {
-        for (const skill of SKILLS) {
-            allCombinations.push({ leaderboardType: type, skill });
+        for (const skill of skills) {
+            allCombinations.push({ entityType, leaderboardType: type, skill });
         }
     }
 
-    // Allow starting the job from a specific index for debugging.
+    // startIndex and stopIndex logic.
     const startIndexRaw = request.query.startIndex;
     let startIndex = 0;
     if (startIndexRaw) {
@@ -115,39 +128,35 @@ export default async function handler(request, response) {
         }
     }
 
-    // --- NEW: Allow stopping the job at a specific index ---
     const stopIndexRaw = request.query.stopIndex;
-    let stopIndex = allCombinations.length; // Default to the end of the list
+    let stopIndex = allCombinations.length;
     if (stopIndexRaw) {
         const parsedIndex = parseInt(stopIndexRaw, 10);
-        // Use the provided stop index if it's a valid number, but don't exceed the total length
         if (!isNaN(parsedIndex) && parsedIndex > startIndex) {
             stopIndex = Math.min(parsedIndex, allCombinations.length);
         }
     }
 
     const chunkSize = 14;
-    const intervalInMs = 70000; // 70-second interval to respect API rate limits.
+    const intervalInMs = 70000;
     const allResults = [];
 
-    console.log(`Starting leaderboard processing. Total: ${allCombinations.length}. Processing from index ${startIndex} to ${stopIndex}.`);
+    console.log(`Starting leaderboard processing for ENV: ${env}, ENTITY: ${entityType}. Processing from index ${startIndex} to ${stopIndex}.`);
 
-    // --- UPDATED: Loop now respects the stopIndex ---
+    // Process all leaderboards in throttled batches.
     for (let i = startIndex; i < stopIndex; i += chunkSize) {
         const batchStartTime = Date.now();
-        // Adjust chunk to not go past the stopIndex
         const chunk = allCombinations.slice(i, Math.min(i + chunkSize, stopIndex));
         console.log(`Processing batch starting at index ${i}...`);
 
         const chunkResults = await Promise.all(
-            chunk.map(combo => processLeaderboard(combo.leaderboardType, combo.skill))
+            chunk.map(combo => processLeaderboard(combo.entityType, combo.leaderboardType, combo.skill, env))
         );
         allResults.push(...chunkResults);
 
         const elapsedTime = Date.now() - batchStartTime;
         console.log(`Batch complete. Took ${elapsedTime}ms.`);
 
-        // --- UPDATED: Delay condition also respects stopIndex ---
         if (i + chunkSize < stopIndex) {
             const waitTime = intervalInMs - elapsedTime;
             if (waitTime > 0) {
@@ -161,7 +170,7 @@ export default async function handler(request, response) {
 
     const successfulJobs = allResults.filter(r => r.status === 'OK').length;
     const failedJobs = allResults.length - successfulJobs;
-    console.log(`Leaderboard fetch complete. Success: ${successfulJobs}, Failed: ${failedJobs}.`);
+    console.log(`Leaderboard fetch complete for ENV: ${env}, ENTITY: ${entityType}. Success: ${successfulJobs}, Failed: ${failedJobs}.`);
 
     response.status(200).json({ status: 'OK', successfulJobs, failedJobs });
 }

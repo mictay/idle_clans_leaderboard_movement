@@ -1,23 +1,35 @@
 import { kv } from '@vercel/kv';
-import { LEADERBOARD_TYPES, SKILLS } from '../lib/constants.js';
+import { ENTITY_TYPES, LEADERBOARD_TYPES, PLAYERS_AND_CLANS_SKILLS, PET_SKILLS } from '../lib/constants.js';
 
 export default async function handler(request, response) {
+    // --- NEW: Environment Determination Logic ---
+    // This logic ensures the API fetches data from the correct environment.
+    // The frontend doesn't need to pass a parameter; this will default correctly.
+    const env = process.env.VERCEL_ENV || 'development';
+    console.log(`Fetching data for environment: ${env}`);
+    // --- End of new logic ---
+
     const keysToFetch = [];
 
-    // 1. Generate keys for individual leaderboards and their timestamps
-    for (const type of LEADERBOARD_TYPES) {
-        for (const skill of SKILLS) {
-            const name = `${type}-${skill}`;
-            keysToFetch.push(`leaderboard:movements:${name}`);
-            keysToFetch.push(`last-updated:${name}`);
-            keysToFetch.push(`previous-updated:${name}`);
+    // 1. Generate keys for individual leaderboards with the env prefix
+    for (const entityType of ENTITY_TYPES) {
+        const skills = (entityType === 'pets') ? PET_SKILLS : PLAYERS_AND_CLANS_SKILLS;
+        for (const type of LEADERBOARD_TYPES) {
+            for (const skill of skills) {
+                const name = `${entityType}-${type}-${skill}`;
+                keysToFetch.push(`leaderboard:movements:${env}:${name}`);
+                keysToFetch.push(`last-updated:${env}:${name}`);
+                keysToFetch.push(`previous-updated:${env}:${name}`);
+            }
         }
     }
 
-    // 2. Generate keys for the pre-calculated top movers lists
-    for (const type of LEADERBOARD_TYPES) {
-        keysToFetch.push(`top-gainers:${type}`);
-        keysToFetch.push(`top-losers:${type}`);
+    // 2. Generate keys for the pre-calculated top movers lists with the env prefix
+    for (const entityType of ENTITY_TYPES) {
+        for (const type of LEADERBOARD_TYPES) {
+            keysToFetch.push(`top-gainers:${env}:${entityType}:${type}`);
+            keysToFetch.push(`top-losers:${env}:${entityType}:${type}`);
+        }
     }
 
     // 3. Fetch all keys from the database in one efficient batch
@@ -29,15 +41,18 @@ export default async function handler(request, response) {
     let dataIndex = 0;
 
     // Process the individual leaderboard data
-    for (const type of LEADERBOARD_TYPES) {
-        for (const skill of SKILLS) {
-            const name = `${type}-${skill}`;
-            movementsData[name] = allData[dataIndex] || [];
-            timestamps[name] = {
-                lastUpdated: allData[dataIndex + 1],
-                previousUpdated: allData[dataIndex + 2]
-            };
-            dataIndex += 3;
+    for (const entityType of ENTITY_TYPES) {
+        const skills = (entityType === 'pets') ? PET_SKILLS : PLAYERS_AND_CLANS_SKILLS;
+        for (const type of LEADERBOARD_TYPES) {
+            for (const skill of skills) {
+                const name = `${entityType}-${type}-${skill}`;
+                movementsData[name] = allData[dataIndex] || [];
+                timestamps[name] = {
+                    lastUpdated: allData[dataIndex + 1],
+                    previousUpdated: allData[dataIndex + 2]
+                };
+                dataIndex += 3;
+            }
         }
     }
 
@@ -46,9 +61,12 @@ export default async function handler(request, response) {
         gainers: {},
         losers: {}
     };
-    for (const type of LEADERBOARD_TYPES) {
-        topMovers.gainers[type] = allData[dataIndex++] || [];
-        topMovers.losers[type] = allData[dataIndex++] || [];
+    for (const entityType of ENTITY_TYPES) {
+        for (const type of LEADERBOARD_TYPES) {
+            const key = `${entityType}:${type}`;
+            topMovers.gainers[key] = allData[dataIndex++] || [];
+            topMovers.losers[key] = allData[dataIndex++] || [];
+        }
     }
 
     // 5. Send the complete, structured data to the frontend

@@ -7,7 +7,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSortColumn = 'currentRank';
     let currentSortDirection = 'asc';
 
+    // --- SHARED CONSTANTS (for dynamic dropdown) ---
+    const PLAYERS_AND_CLANS_SKILLS = [
+        'total_level', 'smithing', 'woodcutting', 'crafting', 'enchanting',
+        'farming', 'foraging', 'carpentry', 'plundering', 'mining',
+        'cooking', 'brewing', 'agility', 'fishing', 'exterminating',
+        'attack', 'strength', 'magic', 'defence', 'archery', 'health',
+        'zeus', 'medusa', 'hades', 'griffin', 'devil', 'chimera', 'sobek',
+        'kronos', 'malignant_spider', 'skeleton_warrior', 'otherworldly_golem',
+        'reckoning_of_the_gods', 'guardians_of_the_citadel', 'bloodmoon_massacre'
+    ];
+    const PET_SKILLS = [
+        'total_level', 'smithing', 'woodcutting', 'crafting', 'enchanting',
+        'farming', 'foraging', 'carpentry', 'plundering', 'mining',
+        'cooking', 'brewing', 'agility', 'fishing', 'exterminating',
+        'attack', 'strength', 'magic', 'defence', 'archery', 'health'
+    ];
+
     // --- ELEMENT SELECTORS ---
+    const entityTypeSelector = document.querySelector("#entity-type-selector");
     const leaderboardSelector = document.querySelector("#leaderboard-selector");
     const skillSelector = document.querySelector("#skill-selector");
     const skillSelectorGroup = document.querySelector("#skill-selector-group");
@@ -30,6 +48,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const minutes = Math.round((totalHours - hours) * 60);
         return `(${hours}h ${minutes}m)`;
     };
+
+    // --- DYNAMIC UI FUNCTIONS ---
+    function populateSkillSelector(entityType) {
+        const skills = (entityType === 'pets') ? PET_SKILLS : PLAYERS_AND_CLANS_SKILLS;
+        let optionsHtml = '';
+        skills.forEach(skill => {
+            const displayName = (skill === 'total_level') ? 'Total Exp' : formatSkillName(skill);
+            optionsHtml += `<option value="${skill}">${displayName}</option>`;
+        });
+        skillSelector.innerHTML = optionsHtml;
+    }
 
     // --- RENDERING LOGIC ---
     function renderTopMoversTable(tableId, players, isGainers) {
@@ -92,19 +121,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateTopMoversViews() {
+        const entityType = entityTypeSelector.value;
         const leaderboardType = leaderboardSelector.value;
-        renderTopMoversTable("#gains-table", allTopMovers.gainers[leaderboardType] || [], true);
-        renderTopMoversTable("#losses-table", allTopMovers.losers[leaderboardType] || [], false);
+        const moversKey = `${entityType}:${leaderboardType}`;
+        renderTopMoversTable("#gains-table", allTopMovers.gainers[moversKey] || [], true);
+        renderTopMoversTable("#losses-table", allTopMovers.losers[moversKey] || [], false);
     }
 
     function updateLeaderboardView() {
+        const entityType = entityTypeSelector.value;
         const leaderboardType = leaderboardSelector.value;
         const skill = skillSelector.value;
-        const leaderboardKey = `${leaderboardType}-${skill}`;
+        const leaderboardKey = `${entityType}-${leaderboardType}-${skill}`;
+
         currentPlayers = allMovementsData[leaderboardKey] || [];
         const timestamps = allTimestamps[leaderboardKey] || {};
 
-        leaderboardTitle.textContent = `${leaderboardSelector.options[leaderboardSelector.selectedIndex].text} - ${skillSelector.options[skillSelector.selectedIndex].text}`;
+        leaderboardTitle.textContent = `${entityTypeSelector.options[entityTypeSelector.selectedIndex].text} - ${leaderboardSelector.options[leaderboardSelector.selectedIndex].text} - ${skillSelector.options[skillSelector.selectedIndex].text}`;
         const durationText = formatDuration(timestamps.lastUpdated, timestamps.previousUpdated);
         rankDurationSpan.textContent = durationText;
         scoreDurationSpan.textContent = durationText;
@@ -129,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- INITIALIZATION ---
     async function initialize() {
         try {
+            populateSkillSelector(entityTypeSelector.value);
             const response = await fetch('/api/get-all-movements');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
@@ -153,6 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleButtons.forEach(btn => btn.classList.toggle('active', btn === button));
             skillSelectorGroup.style.display = targetViewId === 'leaderboard-view' ? 'flex' : 'none';
         });
+    });
+
+    entityTypeSelector.addEventListener('change', () => {
+        populateSkillSelector(entityTypeSelector.value);
+        updateLeaderboardView();
+        updateTopMoversViews();
     });
 
     leaderboardSelector.addEventListener('change', () => {
