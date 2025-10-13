@@ -1,20 +1,40 @@
 {
     "crons": [
         {
-            "path": "/api/update-leaderboard?startIndex=0&stopIndex=42",
+            "path": "/api/update-leaderboard?entityType=players&startIndex=0&stopIndex=42",
             "schedule": "0 0 * * *"
         },
         {
-            "path": "/api/update-leaderboard?startIndex=43&stopIndex=69",
+            "path": "/api/update-leaderboard?entityType=players&startIndex=43&stopIndex=69",
             "schedule": "5 0 * * *"
         },
         {
-            "path": "/api/update-leaderboard?startIndex=70",
+            "path": "/api/update-leaderboard?entityType=players&startIndex=70",
             "schedule": "10 0 * * *"
         },
         {
-            "path": "/api/calculate-top-movers",
+            "path": "/api/update-leaderboard?entityType=clans&startIndex=0&stopIndex=42",
             "schedule": "15 0 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=clans&startIndex=43&stopIndex=69",
+            "schedule": "20 0 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=clans&startIndex=70",
+            "schedule": "25 0 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=pets&startIndex=0&stopIndex=42",
+            "schedule": "30 0 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=pets&startIndex=43",
+            "schedule": "35 0 * * *"
+        },
+        {
+            "path": "/api/calculate-top-movers",
+            "schedule": "40 0 * * *"
         }
     ],
     "headers": [

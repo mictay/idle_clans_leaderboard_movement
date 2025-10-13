@@ -1,5 +1,5 @@
 import { kv } from '@vercel/kv';
-import { LEADERBOARD_TYPES, SKILLS } from '../lib/constants.js';
+import { ENTITY_TYPES, LEADERBOARD_TYPES, PLAYERS_AND_CLANS_SKILLS, PET_SKILLS } from '../lib/constants.js';
 
 export default async function handler(request, response) {
 
@@ -15,49 +15,53 @@ export default async function handler(request, response) {
         }
     */
 
-    console.log("Starting Top 10 movers calculation...");
+  console.log("Starting Top 10 movers calculation...");
 
-    // Generate all the keys we need to read from the database.
-    const allMovementKeys = [];
-    for (const type of LEADERBOARD_TYPES) {
-        for (const skill of SKILLS) {
-            allMovementKeys.push(`leaderboard:movements:${type}-${skill}`);
-        }
-    }
+  try {
+    // Analyze the data for each combination of entity and game mode.
+    for (const entityType of ENTITY_TYPES) {
+      for (const type of LEADERBOARD_TYPES) {
+        const skills = (entityType === 'pets') ? PET_SKILLS : PLAYERS_AND_CLANS_SKILLS;
+        
+        // Generate all the keys we need to read from the database for this specific combination.
+        const allMovementKeys = skills.map(skill => `leaderboard:movements:${entityType}-${type}-${skill}`);
 
-    // Fetch all movement data in one batch.
-    const allMovementsData = await kv.mget(...allMovementKeys);
+        if (allMovementKeys.length === 0) continue;
 
-    // Analyze the data for each game mode.
-    for (const type of LEADERBOARD_TYPES) {
+        // Fetch all relevant movement data in one batch.
+        const allMovementsData = await kv.mget(...allMovementKeys);
+
         const flatPlayerList = [];
+        
+        // Create a flat list of all player movements.
+        allMovementsData.forEach((movementData, index) => {
+          if (movementData && Array.isArray(movementData)) {
+            movementData.forEach(player => {
+              if (player.movement !== 0) {
+                // Add the specific skill to the player object for context.
+                flatPlayerList.push({ ...player, skill: skills[index] });
+              }
+            });
+          }
+        });
 
-        // Create a flat list of all player movements for this game mode.
-        for (const skill of SKILLS) {
-            const key = `leaderboard:movements:${type}-${skill}`;
-            const index = allMovementKeys.indexOf(key);
-            const movementData = allMovementsData[index];
-
-            if (movementData && Array.isArray(movementData)) {
-                movementData.forEach(player => {
-                    if (player.movement !== 0) {
-                        flatPlayerList.push({ ...player, skill });
-                    }
-                });
-            }
-        }
-
-        // Calculate, save Top 10 Gainers.
+        // Calculate and save Top 10 Gainers.
         flatPlayerList.sort((a, b) => b.movement - a.movement);
-        await kv.set(`top-gainers:${type}`, flatPlayerList.slice(0, 10));
+        await kv.set(`top-gainers:${entityType}:${type}`, flatPlayerList.slice(0, 10));
 
-        // Calculate, save Top 10 Losers.
+        // Calculate and save Top 10 Losers.
         flatPlayerList.sort((a, b) => a.movement - b.movement);
-        await kv.set(`top-losers:${type}`, flatPlayerList.filter(p => p.movement < 0).slice(0, 10));
-
-        console.log(`Saved Top 10 movers for ${type}.`);
+        await kv.set(`top-losers:${entityType}:${type}`, flatPlayerList.filter(p => p.movement < 0).slice(0, 10));
+        
+        console.log(`Saved Top 10 movers for ${entityType}:${type}.`);
+      }
     }
 
     console.log("Top 10 movers calculation complete.");
     response.status(200).json({ status: 'OK', message: 'Top movers calculated successfully.' });
+
+  } catch (error) {
+    console.error("An error occurred during Top Movers calculation:", error);
+    response.status(500).json({ status: 'Error', message: 'Failed to calculate top movers.' });
+  }
 }
