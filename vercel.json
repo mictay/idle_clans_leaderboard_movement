@@ -6,15 +6,15 @@
         },
         {
             "path": "/api/update-leaderboard?startIndex=43&stopIndex=69",
-            "schedule": "10 0 * * *"
+            "schedule": "5 0 * * *"
         },
         {
             "path": "/api/update-leaderboard?startIndex=70",
-            "schedule": "20 0 * * *"
+            "schedule": "10 0 * * *"
         },
         {
             "path": "/api/calculate-top-movers",
-            "schedule": "30 0 * * *"
+            "schedule": "15 0 * * *"
         }
     ],
     "headers": [

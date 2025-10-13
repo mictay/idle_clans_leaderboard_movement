@@ -24,8 +24,9 @@ api docs:  https://query.idleclans.com/api-docs/index.html
 
 ## Sample api calls
 https://query.idleclans.com/api/Leaderboard/top/players:groupironman/foraging
-https://query.idleclans.com/api/Player/profile/DerfRevrac
+
 https://query.idleclans.com/api/Leaderboard/profile/players:groupironman/DerfRevrac
+https://query.idleclans.com/api/Player/profile/DerfRevrac
 
 ## Skills
 total_level
@@ -75,7 +76,7 @@ bloodmoon_massacre
 - - To skip the first 14 and start at the 15th leaderboard (index 14): https://your-site.vercel.app/api/update-leaderboard?startIndex=14
 - - To restart from the 50th leaderboard (index 49): https://your-site.vercel.app/api/update-leaderboard?startIndex=49
 
-# Running the Cron job locall
+# Running the Cron job locally
 Terminal 1
 ```
 vercel dev
