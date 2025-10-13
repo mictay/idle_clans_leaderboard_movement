@@ -5,7 +5,8 @@ import { ENTITY_TYPES, LEADERBOARD_TYPES, PLAYERS_AND_CLANS_SKILLS, PET_SKILLS }
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
- * Processes a single leaderboard, fetching data, calculating movements, and saving to KV.
+ * Processes a single leaderboard by fetching two pages (1-100 and 101-200),
+ * combining them, calculating movements, and saving to KV.
  * This function is designed to be resilient, handling its own errors.
  * @param {string} entityType - The entity type (e.g., 'players').
  * @param {string} leaderboardType - The game mode (e.g., 'groupironman').
@@ -15,11 +16,12 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  */
 async function processLeaderboard(entityType, leaderboardType, skill, env) {
     const baseLeaderboardName = `${entityType}-${leaderboardType}-${skill}`;
-    // All keys are now prefixed with the environment
     const leaderboardName = `${env}:${baseLeaderboardName}`;
-
     const apiEntityType = `${entityType}:${leaderboardType}`;
-    const apiUrl = `https://query.idleclans.com/api/Leaderboard/top/${apiEntityType}/${skill}`;
+
+    // Define URLs for both pages of the API with corrected maxCount
+    const apiUrlPage1 = `https://query.idleclans.com/api/Leaderboard/top/${apiEntityType}/${skill}?startCount=1&maxCount=100`;
+    const apiUrlPage2 = `https://query.idleclans.com/api/Leaderboard/top/${apiEntityType}/${skill}?startCount=101&maxCount=200`;
 
     const movementsKey = `leaderboard:movements:${leaderboardName}`;
     const lastUpdatedKey = `last-updated:${leaderboardName}`;
@@ -28,13 +30,23 @@ async function processLeaderboard(entityType, leaderboardType, skill, env) {
     try {
         const oldTimestamp = await kv.get(lastUpdatedKey);
 
-        const apiResponse = await fetch(apiUrl);
-        if (!apiResponse.ok) {
-            const reason = `API fetch failed with status: ${apiResponse.status}`;
+        // Fetch both pages concurrently for efficiency
+        const [response1, response2] = await Promise.all([
+            fetch(apiUrlPage1),
+            fetch(apiUrlPage2)
+        ]);
+
+        if (!response1.ok || !response2.ok) {
+            const reason = `API fetch failed. Statuses: Page1=${response1.status}, Page2=${response2.status}`;
             console.error(`Failed to process ${baseLeaderboardName}: ${reason}`);
             return { leaderboard: baseLeaderboardName, status: 'error', reason };
         }
-        const currentLeaderboard = await apiResponse.json();
+
+        const data1 = await response1.json();
+        const data2 = await response2.json();
+
+        // Combine the results into a single array of up to 200 players
+        const currentLeaderboard = [...data1, ...data2];
 
         // Clean up players who have dropped off the leaderboard.
         const currentPlayerUsernames = new Set(currentLeaderboard.map(p => p.username));
@@ -102,7 +114,6 @@ export default async function handler(request, response) {
     const requestedEnv = request.query.env;
     const env = requestedEnv || process.env.VERCEL_ENV || 'development';
 
-
     // Validate the entityType from the query string.
     const entityType = request.query.entityType;
     if (!entityType || !ENTITY_TYPES.includes(entityType)) {
@@ -137,7 +148,7 @@ export default async function handler(request, response) {
         }
     }
 
-    const chunkSize = 14;
+    const chunkSize = 7;
     const intervalInMs = 70000;
     const allResults = [];
 

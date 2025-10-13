@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPlayers = [];
     let currentSortColumn = 'currentRank';
     let currentSortDirection = 'asc';
+    let currentPage = 1; // For pagination
 
     // --- SHARED CONSTANTS (for dynamic dropdown) ---
     const PLAYERS_AND_CLANS_SKILLS = [
@@ -36,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const leaderboardTable = document.querySelector("#leaderboard-table");
     const rankDurationSpan = document.querySelector("#rank-change-duration");
     const scoreDurationSpan = document.querySelector("#score-change-duration");
+    const paginationControls = document.querySelector(".pagination-controls");
 
     // --- UTILITY FUNCTIONS ---
     const formatSkillName = (skill) => skill.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -85,11 +87,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderLeaderboardTable() {
         const tbody = leaderboardTable.querySelector('tbody');
         tbody.innerHTML = '';
+
+        if (currentPlayers.length > 100) {
+            paginationControls.style.display = 'flex';
+        } else {
+            paginationControls.style.display = 'none';
+        }
+
         if (currentPlayers.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem;">No data available.</td></tr>`;
             return;
         }
-        currentPlayers.forEach(p => {
+
+        const startIndex = (currentPage - 1) * 100;
+        const endIndex = startIndex + 100;
+        const pagePlayers = currentPlayers.slice(startIndex, endIndex);
+
+        pagePlayers.forEach(p => {
             const row = document.createElement('tr');
             const expChangeClass = p.scoreDelta > 0 ? 'positive' : 'negative';
             const rankChangeClass = p.movement > 0 ? 'positive' : 'negative';
@@ -129,6 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateLeaderboardView() {
+        currentPage = 1; // Reset to page 1
+        paginationControls.querySelectorAll('.pagination-btn').forEach(btn => {
+            btn.classList.toggle('active', parseInt(btn.dataset.page, 10) === currentPage);
+        });
+
         const entityType = entityTypeSelector.value;
         const leaderboardType = leaderboardSelector.value;
         const skill = skillSelector.value;
@@ -185,7 +204,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetViewId = button.dataset.view;
             views.forEach(view => view.classList.toggle('active', view.id === targetViewId));
             toggleButtons.forEach(btn => btn.classList.toggle('active', btn === button));
-            skillSelectorGroup.style.display = targetViewId === 'leaderboard-view' ? 'flex' : 'none';
+
+            const isLeaderboardView = targetViewId === 'leaderboard-view';
+            skillSelectorGroup.style.display = isLeaderboardView ? 'flex' : 'none';
+            paginationControls.style.display = isLeaderboardView && currentPlayers.length > 100 ? 'flex' : 'none';
         });
     });
 
@@ -215,6 +237,19 @@ document.addEventListener('DOMContentLoaded', () => {
             renderLeaderboardTable();
             updateSortIndicators();
         });
+    });
+
+    paginationControls.addEventListener('click', (event) => {
+        if (event.target.matches('.pagination-btn')) {
+            const page = parseInt(event.target.dataset.page, 10);
+            if (page !== currentPage) {
+                currentPage = page;
+                paginationControls.querySelectorAll('.pagination-btn').forEach(btn => {
+                    btn.classList.toggle('active', parseInt(btn.dataset.page, 10) === currentPage);
+                });
+                renderLeaderboardTable();
+            }
+        }
     });
 
     initialize();

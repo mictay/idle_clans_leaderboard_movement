@@ -1,39 +1,50 @@
 :root {
-    --background-color: #f4f7f9;
-    --container-bg: #ffffff;
-    --text-color: #2d3748;
-    --header-color: #1a202c;
-    --border-color: #e2e8f0;
-    --primary-color: #4299e1;
+    --background-color: #0c1108ff;
+    --container-bg-opaque: #0e2935; /* Opaque color for reference */
+    --container-bg-transparent: rgba(14, 41, 53, 0.9); /* 90% opacity */
+    --text-color: #fff;
+    --header-color: #fff;
+    --border-color: #2c3e50;
+    --primary-color: #218c74;
     --positive-color: #38a169;
     --negative-color: #e53e3e;
-    --hover-bg: #edf2f7;
-    --footer-text-color: #718096;
+    --hover-bg: #218c74;
+    --footer-text-color: #a0a0a0;
 }
 body {
     font-family: 'Inter', sans-serif;
-    background-color: var(--background-color);
     color: var(--text-color);
     margin: 0;
     padding: 1rem;
+
+    /* --- UPDATED: Background Image --- */
+    background-color: var(--background-color); /* Fallback color */
+    background-image: url('../images/background3.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* This keeps the image in place on scroll */
 }
 .container {
     max-width: 1024px;
     margin: 2rem auto;
     padding: 1.5rem;
-    background-color: var(--container-bg);
+
+    /* --- UPDATED: Transparency --- */
+    background-color: var(--container-bg-transparent);
+
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 .main-title {
-    color: var(--header-color);
+    color: gold;
     font-size: 1.75rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     text-align: center;
 }
-#leaderboard-title {
-    color: var(--header-color);
+#leaderboard-title, .view h2 {
+    color: goldenrod;
     font-size: 1.5rem;
     font-weight: 600;
     margin-top: 0;
@@ -41,7 +52,7 @@ body {
     text-align: center;
 }
 #last-updated {
-    color: #718096;
+    color: #a0a0a0;
     margin-top: 0;
     margin-bottom: 2rem;
     font-style: italic;
@@ -66,11 +77,12 @@ body {
     font-size: 1rem;
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    background-color: white;
+    background-color: #1a4e48;
+    color: var(--text-color);
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
 }
@@ -92,7 +104,7 @@ th {
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
-    color: #718096;
+    color: #a0a0a0;
 }
 tbody tr:hover {
     background-color: var(--hover-bg);
@@ -129,7 +141,7 @@ tbody tr:hover {
     display: inline-block;
     width: 1em;
     margin-left: 0.5em;
-    color: var(--primary-color);
+    color: #ff793f;
 }
 .view-toggles {
     display: flex;
@@ -140,8 +152,9 @@ tbody tr:hover {
 }
 .toggle-btn {
     padding: 0.75rem 1.5rem;
-    border: 1px solid var(--border-color);
-    background-color: #fff;
+    border: 1px solid #1a4e48;
+    background-color: #1a4e48;
+    color: #fff;
     border-radius: 6px;
     font-size: 1rem;
     font-weight: 600;
@@ -159,6 +172,27 @@ tbody tr:hover {
 .view.active {
     display: block;
 }
+.pagination-controls {
+    display: none; /* Hidden by default, shown by JS if needed */
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.pagination-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-color);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.pagination-btn.active {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
 @media (min-width: 768px) {
     .controls {
         flex-direction: row;
@@ -170,7 +204,7 @@ tbody tr:hover {
     .main-title {
         font-size: 2.25rem;
     }
-    #leaderboard-title {
+    #leaderboard-title, .view h2 {
         font-size: 1.75rem;
     }
 }
