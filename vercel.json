@@ -69,7 +69,7 @@
             "schedule": "0 0 28 2 *"
         },
         {
-            "path": "/api/calculate-top-movers&env=preview",
+            "path": "/api/calculate-top-movers?env=preview",
             "schedule": "0 0 28 2 *"
         }
     ],
