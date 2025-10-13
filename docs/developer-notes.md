@@ -88,3 +88,14 @@ Invoke-WebRequest http://localhost:3000/api/update-leaderboard?startIndex=0 -Tim
 ```
 
 terminal 2 may time out, just update the startIndex=0 to the last successful index
+
+
+# Colors
+
+background: 1d2e11
+panel dark green: 0e2935
+highlight green (active tab): 218c74
+inactive green (inactive tab): 0e2936
+inactive green (inactive tab alt): 1a4e48
+red: b33939
+notice orange: ff793f
