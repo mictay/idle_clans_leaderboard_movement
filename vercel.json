@@ -46,7 +46,7 @@
         },
         {
             "path": "/api/calculate-top-movers",
-            "schedule": "35 0 * * *"
+            "schedule": "35 1 * * *"
         }
     ],
     "headers": [
