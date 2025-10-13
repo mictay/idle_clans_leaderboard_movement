@@ -102,6 +102,7 @@ export default async function handler(request, response) {
     const requestedEnv = request.query.env;
     const env = requestedEnv || process.env.VERCEL_ENV || 'development';
 
+
     // Validate the entityType from the query string.
     const entityType = request.query.entityType;
     if (!entityType || !ENTITY_TYPES.includes(entityType)) {
