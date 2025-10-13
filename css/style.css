@@ -19,7 +19,7 @@ body {
 
     /* --- UPDATED: Background Image --- */
     background-color: var(--background-color); /* Fallback color */
-    background-image: url('../images/background2.png');
+    background-image: url('../images/background3.png');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
