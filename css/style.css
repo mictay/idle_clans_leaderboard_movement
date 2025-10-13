@@ -1,5 +1,5 @@
 :root {
-    --background-color: #1d2e11;
+    --background-color: #0c1108ff;
     --container-bg-opaque: #0e2935; /* Opaque color for reference */
     --container-bg-transparent: rgba(14, 41, 53, 0.9); /* 90% opacity */
     --text-color: #fff;
@@ -19,7 +19,7 @@ body {
 
     /* --- UPDATED: Background Image --- */
     background-color: var(--background-color); /* Fallback color */
-    background-image: url('../images/background.jpg');
+    background-image: url('../images/background.png');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
