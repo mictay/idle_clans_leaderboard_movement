@@ -6,47 +6,47 @@
         },
         {
             "path": "/api/update-leaderboard?entityType=players&startIndex=29&stopIndex=57",
-            "schedule": "5 0 * * *"
+            "schedule": "7 0 * * *"
         },
         {
             "path": "/api/update-leaderboard?entityType=players&startIndex=57&stopIndex=85",
-            "schedule": "5 0 * * *"
+            "schedule": "14 0 * * *"
         },
         {
             "path": "/api/update-leaderboard?entityType=players&startIndex=85",
-            "schedule": "10 0 * * *"
+            "schedule": "28 0 * * *"
         },
         {
             "path": "/api/update-leaderboard?entityType=clans&startIndex=0&stopIndex=29",
-            "schedule": "15 0 * * *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=clans&startIndex=29&stopIndex=57",
-            "schedule": "20 0 * * *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=clans&startIndex=57&stopIndex=85",
-            "schedule": "20 0 * * *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=clans&startIndex=85",
-            "schedule": "25 0 * * *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=pets&startIndex=0&stopIndex=29",
-            "schedule": "30 0 * * *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=pets&startIndex=29&stopIndex=57",
-            "schedule": "30 0 * * *"
-        },
-        {
-            "path": "/api/update-leaderboard?entityType=pets&startIndex=57",
             "schedule": "35 0 * * *"
         },
         {
+            "path": "/api/update-leaderboard?entityType=clans&startIndex=29&stopIndex=57",
+            "schedule": "42 0 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=clans&startIndex=57&stopIndex=85",
+            "schedule": "49 0 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=clans&startIndex=85",
+            "schedule": "56 0 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=pets&startIndex=0&stopIndex=29",
+            "schedule": "7 1 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=pets&startIndex=29&stopIndex=57",
+            "schedule": "14 1 * * *"
+        },
+        {
+            "path": "/api/update-leaderboard?entityType=pets&startIndex=57",
+            "schedule": "28 1 * * *"
+        },
+        {
             "path": "/api/calculate-top-movers",
-            "schedule": "40 0 * * *"
+            "schedule": "35 0 * * *"
         }
     ],
     "headers": [
