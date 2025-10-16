@@ -193,6 +193,25 @@ tbody tr:hover {
     color: #fff;
     border-color: var(--primary-color);
 }
+
+/* --- ADDITIONS FOR NEW FEATURES --- */
+
+/* Style for the highlighted player row */
+.highlighted-row {
+  background-color: #3e4e6a; /* A distinct highlight color */
+  font-weight: bold;
+}
+
+/* Make sure hover effect still works on highlighted row */
+.highlighted-row:hover {
+    background-color: #4a5c7a; /* A slightly lighter hover for the highlight */
+}
+
+/* Container for the search input to match other controls */
+.search-control {
+    flex-grow: 2; /* Give it a bit more space if needed */
+}
+
 @media (min-width: 768px) {
     .controls {
         flex-direction: row;

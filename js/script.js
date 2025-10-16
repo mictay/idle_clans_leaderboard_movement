@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSortColumn = 'currentRank';
     let currentSortDirection = 'asc';
     let currentPage = 1; // For pagination
+    let allPlayerNames = new Set(); // Using a Set for automatic uniqueness
+    const playerSearchInput = document.querySelector("#player-search");
 
     // --- SHARED CONSTANTS (for dynamic dropdown) ---
     const PLAYERS_AND_CLANS_SKILLS = [
@@ -115,6 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="${expChangeClass}">${p.scoreDelta > 0 ? '+' : ''}${p.scoreDelta.toLocaleString()}</td>`;
             tbody.appendChild(row);
         });
+
+        highlightSelectedPlayer();
     }
 
     // --- DATA & VIEW UPDATE LOGIC ---
@@ -178,6 +182,26 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSortIndicators();
     }
 
+    function highlightSelectedPlayer() {
+        const selectedPlayer = localStorage.getItem('selectedPlayer');
+        const tbody = leaderboardTable.querySelector('tbody');
+
+        // First, remove any existing highlights
+        tbody.querySelectorAll('tr.highlighted-row').forEach(row => {
+            row.classList.remove('highlighted-row');
+        });
+
+        if (selectedPlayer) {
+            tbody.querySelectorAll('tr').forEach(row => {
+                // Assuming player name is in the second cell (index 1)
+                const nameCell = row.cells[1];
+                if (nameCell && nameCell.textContent.trim() === selectedPlayer) {
+                    row.classList.add('highlighted-row');
+                }
+            });
+        }
+    }
+
     // --- INITIALIZATION ---
     async function initialize() {
         try {
@@ -189,6 +213,15 @@ document.addEventListener('DOMContentLoaded', () => {
             allMovementsData = data.movementsData;
             allTimestamps = data.timestamps;
             allTopMovers = data.topMovers;
+
+            Object.values(allMovementsData).forEach(leaderboard => {
+                leaderboard.forEach(player => allPlayerNames.add(player.username));
+            });
+
+            const savedPlayer = localStorage.getItem('selectedPlayer');
+            if (savedPlayer) {
+                playerSearchInput.value = savedPlayer;
+            }
 
             updateLeaderboardView();
             updateTopMoversViews();
@@ -250,6 +283,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderLeaderboardTable();
             }
         }
+    });
+
+    // Listener for clicking a player row to select/highlight them
+    leaderboardTable.querySelector('tbody').addEventListener('click', (event) => {
+        const row = event.target.closest('tr');
+        if (!row || row.parentElement.tagName.toLowerCase() !== 'tbody') return;
+
+        const playerName = row.cells[1].textContent.trim();
+        if (playerName) {
+            localStorage.setItem('selectedPlayer', playerName);
+            playerSearchInput.value = playerName; // Sync search box
+            highlightSelectedPlayer();
+        }
+    });
+
+    // Listener for the search input to clear the selection
+    playerSearchInput.addEventListener('input', () => {
+        // If user clears the search box, clear the selection
+        if (playerSearchInput.value.trim() === '') {
+            localStorage.removeItem('selectedPlayer');
+            highlightSelectedPlayer();
+        }
+        // Note: A full autocomplete is more complex, but this handles clearing.
+        // To complete the autocomplete, you would filter `allPlayerNames` here
+        // and display a dropdown of suggestions. When a suggestion is clicked,
+        // you'd set localStorage and call highlightSelectedPlayer().
     });
 
     initialize();
