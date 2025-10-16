@@ -83,9 +83,11 @@
 
             <div class="control-group search-control">
                 <label for="player-search">Search & Highlight Player</label>
-                <input type="text" id="player-search" placeholder="Start typing a player name...">
+                <div class="autocomplete-container">
+                    <input type="text" id="player-search" placeholder="Start typing a player name..." autocomplete="off">
+                    <div id="autocomplete-results" class="autocomplete-items"></div>
+                </div>
             </div>
-
         </div>
 
         <nav class="view-toggles">

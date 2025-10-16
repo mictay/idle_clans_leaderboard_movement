@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSortDirection = 'asc';
     let currentPage = 1; // For pagination
     let allPlayerNames = new Set(); // Using a Set for automatic uniqueness
-    const playerSearchInput = document.querySelector("#player-search");
 
     // --- SHARED CONSTANTS (for dynamic dropdown) ---
     const PLAYERS_AND_CLANS_SKILLS = [
@@ -40,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const rankDurationSpan = document.querySelector("#rank-change-duration");
     const scoreDurationSpan = document.querySelector("#score-change-duration");
     const paginationControls = document.querySelector(".pagination-controls");
+    const playerSearchInput = document.querySelector("#player-search");
+    const autocompleteResults = document.querySelector("#autocomplete-results");
 
     // --- UTILITY FUNCTIONS ---
     const formatSkillName = (skill) => skill.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());

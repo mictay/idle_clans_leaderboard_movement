@@ -211,7 +211,39 @@ tbody tr:hover {
 .search-control {
     flex-grow: 2; /* Give it a bit more space if needed */
 }
+/* The container that holds both the input and the results list */
+.autocomplete-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
 
+/* The div that holds all the suggestion items */
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    z-index: 99;
+    top: 100%; /* Position it right below the input */
+    left: 0;
+    right: 0;
+    background-color: #1a4e48;
+    max-height: 250px; /* Prevent a super long list */
+    overflow-y: auto; /* Add scroll if needed */
+}
+
+/* A single suggestion item */
+.autocomplete-items div {
+    padding: 0.75rem;
+    cursor: pointer;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Hover effect for a suggestion */
+.autocomplete-items div:hover {
+    background-color: var(--hover-bg);
+}
 @media (min-width: 768px) {
     .controls {
         flex-direction: row;
