@@ -72,13 +72,20 @@ body {
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
-.controls select {
+.controls select,
+.controls input[type="text"] {
     padding: 0.75rem;
     font-size: 1rem;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     background-color: #1a4e48;
     color: var(--text-color);
+    box-sizing: border-box; /* Ensures padding doesn't add to the width */
+    width: 100%;
+}
+
+/* --- REVISED: Styles specific to dropdowns (the arrow) --- */
+.controls select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -192,6 +199,57 @@ tbody tr:hover {
     background-color: var(--primary-color);
     color: #fff;
     border-color: var(--primary-color);
+}
+
+/* --- ADDITIONS FOR NEW FEATURES --- */
+
+/* Style for the highlighted player row */
+.highlighted-row {
+  background-color: #3e4e6a; /* A distinct highlight color */
+  font-weight: bold;
+}
+
+/* Make sure hover effect still works on highlighted row */
+.highlighted-row:hover {
+    background-color: #4a5c7a; /* A slightly lighter hover for the highlight */
+}
+
+/* Container for the search input to match other controls */
+.search-control {
+    flex-grow: 2; /* Give it a bit more space if needed */
+}
+/* The container that holds both the input and the results list */
+.autocomplete-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* The div that holds all the suggestion items */
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    z-index: 99;
+    top: 100%; /* Position it right below the input */
+    left: 0;
+    right: 0;
+    background-color: #1a4e48;
+    max-height: 250px; /* Prevent a super long list */
+    overflow-y: auto; /* Add scroll if needed */
+}
+
+/* A single suggestion item */
+.autocomplete-items div {
+    padding: 0.75rem;
+    cursor: pointer;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Hover effect for a suggestion */
+.autocomplete-items div:hover {
+    background-color: var(--hover-bg);
 }
 @media (min-width: 768px) {
     .controls {

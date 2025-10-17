@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSortColumn = 'currentRank';
     let currentSortDirection = 'asc';
     let currentPage = 1; // For pagination
+    let allPlayerNames = new Set(); // Using a Set for automatic uniqueness
 
     // --- SHARED CONSTANTS (for dynamic dropdown) ---
     const PLAYERS_AND_CLANS_SKILLS = [
@@ -38,6 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const rankDurationSpan = document.querySelector("#rank-change-duration");
     const scoreDurationSpan = document.querySelector("#score-change-duration");
     const paginationControls = document.querySelector(".pagination-controls");
+    const playerSearchInput = document.querySelector("#player-search");
+    const autocompleteResults = document.querySelector("#autocomplete-results");
+    const highlightedPlayerBtn = document.querySelector("#highlighted-player-btn");
+    const highlightedPlayerTitle = document.querySelector("#highlighted-player-title");
+    const highlightedPlayerTableBody = document.querySelector("#highlighted-player-table tbody");
 
     // --- UTILITY FUNCTIONS ---
     const formatSkillName = (skill) => skill.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -115,6 +121,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="${expChangeClass}">${p.scoreDelta > 0 ? '+' : ''}${p.scoreDelta.toLocaleString()}</td>`;
             tbody.appendChild(row);
         });
+
+        highlightSelectedPlayer();
+    }
+
+    function renderHighlightedPlayerView() {
+        const selectedPlayer = localStorage.getItem('selectedPlayer');
+        highlightedPlayerTableBody.innerHTML = ''; // Clear previous data
+
+        if (!selectedPlayer) {
+            highlightedPlayerTitle.textContent = 'No Player Selected';
+            highlightedPlayerTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem;">Please select a player to see their stats.</td></tr>`;
+            return;
+        }
+
+        highlightedPlayerTitle.textContent = `All Stats for ${selectedPlayer}`;
+        let playerRecords = [];
+
+        // Iterate through ALL leaderboards to find the player
+        for (const [leaderboardKey, leaderboard] of Object.entries(allMovementsData)) {
+            const foundPlayer = leaderboard.find(p => p.username === selectedPlayer);
+
+            if (foundPlayer) {
+                // The key format is "entity-gamemode-skill"
+                const [entityType, gameMode, skill] = leaderboardKey.split('-');
+                playerRecords.push({
+                    ...foundPlayer,
+                    gameMode: formatSkillName(gameMode),
+                    entityType: formatSkillName(entityType),
+                    skill: formatSkillName(skill),
+                });
+            }
+        }
+
+        if (playerRecords.length === 0) {
+            highlightedPlayerTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem;">No leaderboard data found for this player.</td></tr>`;
+            return;
+        }
+
+        // Sort records by total experience for a logical order
+        playerRecords.sort((a, b) => b.score - a.score);
+
+        playerRecords.forEach(p => {
+            const row = document.createElement('tr');
+            const expChangeClass = p.scoreDelta > 0 ? 'positive' : 'negative';
+            const rankChangeClass = p.movement > 0 ? 'positive' : 'negative';
+            row.innerHTML = `
+            <td>${p.currentRank}</td>
+            <td>${p.gameMode}</td>
+            <td>${p.entityType}</td>
+            <td>${p.skill}</td>
+            <td>${p.score.toLocaleString()}</td>
+            <td class="${rankChangeClass}">${p.movement > 0 ? '+' : ''}${p.movement}</td>
+            <td class="${expChangeClass}">${p.scoreDelta > 0 ? '+' : ''}${p.scoreDelta.toLocaleString()}</td>`;
+            highlightedPlayerTableBody.appendChild(row);
+        });
     }
 
     // --- DATA & VIEW UPDATE LOGIC ---
@@ -178,6 +239,35 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSortIndicators();
     }
 
+    function highlightSelectedPlayer() {
+        const selectedPlayer = localStorage.getItem('selectedPlayer');
+        const tbody = leaderboardTable.querySelector('tbody');
+
+        // First, remove any existing highlights
+        tbody.querySelectorAll('tr.highlighted-row').forEach(row => {
+            row.classList.remove('highlighted-row');
+        });
+
+        if (selectedPlayer) {
+            tbody.querySelectorAll('tr').forEach(row => {
+                // Assuming player name is in the second cell (index 1)
+                const nameCell = row.cells[1];
+                if (nameCell && nameCell.textContent.trim() === selectedPlayer) {
+                    row.classList.add('highlighted-row');
+                }
+            });
+        }
+    }
+
+    function updateHighlightedPlayerButtonState() {
+        const selectedPlayer = localStorage.getItem('selectedPlayer');
+        if (selectedPlayer) {
+            highlightedPlayerBtn.style.display = 'inline-block';
+        } else {
+            highlightedPlayerBtn.style.display = 'none';
+        }
+    }
+
     // --- INITIALIZATION ---
     async function initialize() {
         try {
@@ -190,6 +280,15 @@ document.addEventListener('DOMContentLoaded', () => {
             allTimestamps = data.timestamps;
             allTopMovers = data.topMovers;
 
+            Object.values(allMovementsData).forEach(leaderboard => {
+                leaderboard.forEach(player => allPlayerNames.add(player.username));
+            });
+
+            const savedPlayer = localStorage.getItem('selectedPlayer');
+            if (savedPlayer) {
+                playerSearchInput.value = savedPlayer;
+            }
+            updateHighlightedPlayerButtonState();
             updateLeaderboardView();
             updateTopMoversViews();
         } catch (error) {
@@ -208,6 +307,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const isLeaderboardView = targetViewId === 'leaderboard-view';
             skillSelectorGroup.style.display = isLeaderboardView ? 'flex' : 'none';
             paginationControls.style.display = isLeaderboardView && currentPlayers.length > 100 ? 'flex' : 'none';
+
+            if (targetViewId === 'highlighted-player-view') {
+                renderHighlightedPlayerView();
+            }
+
         });
     });
 
@@ -249,6 +353,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 renderLeaderboardTable();
             }
+        }
+    });
+
+    // Listener for typing in the search input field
+    playerSearchInput.addEventListener('input', function () {
+        const inputValue = this.value;
+        autocompleteResults.innerHTML = ''; // Clear old results on every keystroke
+
+        if (!inputValue) {
+            localStorage.removeItem('selectedPlayer');
+            highlightSelectedPlayer();
+            updateHighlightedPlayerButtonState(); // <-- ADD THIS
+            return;
+        }
+
+        // Filter the master list of names based on the input
+        const filteredNames = Array.from(allPlayerNames).filter(name =>
+            name.toLowerCase().includes(inputValue.toLowerCase())
+        );
+
+        // Create and display a div for each of the top 10 matches
+        filteredNames.slice(0, 10).forEach(playerName => {
+            const suggestionDiv = document.createElement('div');
+
+            // Make the matching text bold for better visibility
+            const matchIndex = playerName.toLowerCase().indexOf(inputValue.toLowerCase());
+            const matchEnd = matchIndex + inputValue.length;
+            suggestionDiv.innerHTML =
+                playerName.substring(0, matchIndex) +
+                `<strong>${playerName.substring(matchIndex, matchEnd)}</strong>` +
+                playerName.substring(matchEnd);
+
+            // Add a click listener to each suggestion item
+            suggestionDiv.addEventListener('click', () => {
+                playerSearchInput.value = playerName; // Update the search box text
+                localStorage.setItem('selectedPlayer', playerName); // Save the selection
+                highlightSelectedPlayer(); // Apply the highlight
+                updateHighlightedPlayerButtonState();
+                autocompleteResults.innerHTML = ''; // Close the suggestions list
+            });
+
+            autocompleteResults.appendChild(suggestionDiv);
+        });
+    });
+
+    // Listener for clicking a player row in the main table
+    leaderboardTable.querySelector('tbody').addEventListener('click', (event) => {
+        const row = event.target.closest('tr');
+        if (!row || !row.cells[1]) return; // Ensure it's a valid player row
+
+        const playerName = row.cells[1].textContent.trim();
+        playerSearchInput.value = playerName; // Sync the search box
+        localStorage.setItem('selectedPlayer', playerName); // Save selection
+        highlightSelectedPlayer(); // Apply highlight
+        updateHighlightedPlayerButtonState();
+        autocompleteResults.innerHTML = ''; // Close suggestions if they are open
+    });
+
+    // Listener to close the autocomplete list if the user clicks anywhere else
+    document.addEventListener('click', (event) => {
+        const searchContainer = document.querySelector('.autocomplete-container');
+        if (!searchContainer.contains(event.target)) {
+            autocompleteResults.innerHTML = '';
         }
     });
 

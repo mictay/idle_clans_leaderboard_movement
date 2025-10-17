@@ -80,12 +80,21 @@
                     <option value="bloodmoon_massacre">Bloodmoon Massacre</option>
                 </select>
             </div>
+
+            <div class="control-group search-control">
+                <label for="player-search">Search & Highlight Player</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="player-search" placeholder="Start typing a player name..." autocomplete="off">
+                    <div id="autocomplete-results" class="autocomplete-items"></div>
+                </div>
+            </div>
         </div>
 
         <nav class="view-toggles">
             <button class="toggle-btn active" data-view="leaderboard-view">Leaderboards</button>
             <button class="toggle-btn" data-view="gains-view">Top 10 Rank Gains</button>
             <button class="toggle-btn" data-view="losses-view">Top 10 Rank Losses</button>
+            <button class="toggle-btn" data-view="highlighted-player-view" id="highlighted-player-btn" style="display: none;">Highlighted Player</button>
         </nav>
 
         <div id="leaderboard-view" class="view active">
@@ -118,6 +127,28 @@
                 <table id="losses-table"></table>
             </div>
         </div>
+
+        <div id="highlighted-player-view" class="view">
+            <h2 id="highlighted-player-title">Highlighted Player Stats</h2>
+            <div class="table-wrapper">
+                <table id="highlighted-player-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Game Mode</th>
+                            <th>Entity Type</th>
+                            <th>Skill</th>
+                            <th>EXP</th>
+                            <th>Rank Change</th>
+                            <th>Exp Change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <footer class="site-footer">
