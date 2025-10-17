@@ -169,9 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Sort records by total experience for a logical order
-        playerRecords.sort((a, b) => b.score - a.score);
-
         playerRecords.forEach(p => {
             const row = document.createElement('tr');
             const expChangeClass = p.scoreDelta > 0 ? 'positive' : 'negative';
