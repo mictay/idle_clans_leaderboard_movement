@@ -286,30 +286,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Listener for clicking a player row to select/highlight them
-    leaderboardTable.querySelector('tbody').addEventListener('click', (event) => {
-        const row = event.target.closest('tr');
-        if (!row || row.parentElement.tagName.toLowerCase() !== 'tbody') return;
+    // Listener for typing in the search input field
+    playerSearchInput.addEventListener('input', function () {
+        const inputValue = this.value;
+        autocompleteResults.innerHTML = ''; // Clear old results on every keystroke
 
-        const playerName = row.cells[1].textContent.trim();
-        if (playerName) {
-            localStorage.setItem('selectedPlayer', playerName);
-            playerSearchInput.value = playerName; // Sync search box
-            highlightSelectedPlayer();
-        }
-    });
-
-    // Listener for the search input to clear the selection
-    playerSearchInput.addEventListener('input', () => {
-        // If user clears the search box, clear the selection
-        if (playerSearchInput.value.trim() === '') {
+        if (!inputValue) {
+            // If search box is cleared by the user, remove the saved player
             localStorage.removeItem('selectedPlayer');
             highlightSelectedPlayer();
+            return;
         }
-        // Note: A full autocomplete is more complex, but this handles clearing.
-        // To complete the autocomplete, you would filter `allPlayerNames` here
-        // and display a dropdown of suggestions. When a suggestion is clicked,
-        // you'd set localStorage and call highlightSelectedPlayer().
+
+        // Filter the master list of names based on the input
+        const filteredNames = Array.from(allPlayerNames).filter(name =>
+            name.toLowerCase().includes(inputValue.toLowerCase())
+        );
+
+        // Create and display a div for each of the top 10 matches
+        filteredNames.slice(0, 10).forEach(playerName => {
+            const suggestionDiv = document.createElement('div');
+
+            // Make the matching text bold for better visibility
+            const matchIndex = playerName.toLowerCase().indexOf(inputValue.toLowerCase());
+            const matchEnd = matchIndex + inputValue.length;
+            suggestionDiv.innerHTML =
+                playerName.substring(0, matchIndex) +
+                `<strong>${playerName.substring(matchIndex, matchEnd)}</strong>` +
+                playerName.substring(matchEnd);
+
+            // Add a click listener to each suggestion item
+            suggestionDiv.addEventListener('click', () => {
+                playerSearchInput.value = playerName; // Update the search box text
+                localStorage.setItem('selectedPlayer', playerName); // Save the selection
+                highlightSelectedPlayer(); // Apply the highlight
+                autocompleteResults.innerHTML = ''; // Close the suggestions list
+            });
+
+            autocompleteResults.appendChild(suggestionDiv);
+        });
+    });
+
+    // Listener for clicking a player row in the main table
+    leaderboardTable.querySelector('tbody').addEventListener('click', (event) => {
+        const row = event.target.closest('tr');
+        if (!row || !row.cells[1]) return; // Ensure it's a valid player row
+
+        const playerName = row.cells[1].textContent.trim();
+        playerSearchInput.value = playerName; // Sync the search box
+        localStorage.setItem('selectedPlayer', playerName); // Save selection
+        highlightSelectedPlayer(); // Apply highlight
+        autocompleteResults.innerHTML = ''; // Close suggestions if they are open
+    });
+
+    // Listener to close the autocomplete list if the user clicks anywhere else
+    document.addEventListener('click', (event) => {
+        const searchContainer = document.querySelector('.autocomplete-container');
+        // If the click is outside the search container, close the results
+        if (!searchContainer.contains(event.target)) {
+            autocompleteResults.innerHTML = '';
+        }
     });
 
     initialize();
