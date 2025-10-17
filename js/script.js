@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const paginationControls = document.querySelector(".pagination-controls");
     const playerSearchInput = document.querySelector("#player-search");
     const autocompleteResults = document.querySelector("#autocomplete-results");
+    const highlightedPlayerBtn = document.querySelector("#highlighted-player-btn");
+    const highlightedPlayerTitle = document.querySelector("#highlighted-player-title");
+    const highlightedPlayerTableBody = document.querySelector("#highlighted-player-table tbody");
 
     // --- UTILITY FUNCTIONS ---
     const formatSkillName = (skill) => skill.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -120,6 +123,59 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         highlightSelectedPlayer();
+    }
+
+    function renderHighlightedPlayerView() {
+        const selectedPlayer = localStorage.getItem('selectedPlayer');
+        highlightedPlayerTableBody.innerHTML = ''; // Clear previous data
+
+        if (!selectedPlayer) {
+            highlightedPlayerTitle.textContent = 'No Player Selected';
+            highlightedPlayerTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem;">Please select a player to see their stats.</td></tr>`;
+            return;
+        }
+
+        highlightedPlayerTitle.textContent = `All Stats for ${selectedPlayer}`;
+        let playerRecords = [];
+
+        // Iterate through ALL leaderboards to find the player
+        for (const [leaderboardKey, leaderboard] of Object.entries(allMovementsData)) {
+            const foundPlayer = leaderboard.find(p => p.username === selectedPlayer);
+
+            if (foundPlayer) {
+                // The key format is "entity-gamemode-skill"
+                const [entityType, gameMode, skill] = leaderboardKey.split('-');
+                playerRecords.push({
+                    ...foundPlayer,
+                    gameMode: formatSkillName(gameMode),
+                    entityType: formatSkillName(entityType),
+                    skill: formatSkillName(skill),
+                });
+            }
+        }
+
+        if (playerRecords.length === 0) {
+            highlightedPlayerTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem;">No leaderboard data found for this player.</td></tr>`;
+            return;
+        }
+
+        // Sort records by total experience for a logical order
+        playerRecords.sort((a, b) => b.score - a.score);
+
+        playerRecords.forEach(p => {
+            const row = document.createElement('tr');
+            const expChangeClass = p.scoreDelta > 0 ? 'positive' : 'negative';
+            const rankChangeClass = p.movement > 0 ? 'positive' : 'negative';
+            row.innerHTML = `
+            <td>${p.currentRank}</td>
+            <td>${p.gameMode}</td>
+            <td>${p.entityType}</td>
+            <td>${p.skill}</td>
+            <td>${p.score.toLocaleString()}</td>
+            <td class="${rankChangeClass}">${p.movement > 0 ? '+' : ''}${p.movement}</td>
+            <td class="${expChangeClass}">${p.scoreDelta > 0 ? '+' : ''}${p.scoreDelta.toLocaleString()}</td>`;
+            highlightedPlayerTableBody.appendChild(row);
+        });
     }
 
     // --- DATA & VIEW UPDATE LOGIC ---
@@ -203,6 +259,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function updateHighlightedPlayerButtonState() {
+        const selectedPlayer = localStorage.getItem('selectedPlayer');
+        if (selectedPlayer) {
+            highlightedPlayerBtn.style.display = 'inline-block';
+        } else {
+            highlightedPlayerBtn.style.display = 'none';
+        }
+    }
+
     // --- INITIALIZATION ---
     async function initialize() {
         try {
@@ -223,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (savedPlayer) {
                 playerSearchInput.value = savedPlayer;
             }
-
+            updateHighlightedPlayerButtonState();
             updateLeaderboardView();
             updateTopMoversViews();
         } catch (error) {
@@ -242,6 +307,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const isLeaderboardView = targetViewId === 'leaderboard-view';
             skillSelectorGroup.style.display = isLeaderboardView ? 'flex' : 'none';
             paginationControls.style.display = isLeaderboardView && currentPlayers.length > 100 ? 'flex' : 'none';
+
+            if (targetViewId === 'highlighted-player-view') {
+                renderHighlightedPlayerView();
+            }
+
         });
     });
 
@@ -292,9 +362,9 @@ document.addEventListener('DOMContentLoaded', () => {
         autocompleteResults.innerHTML = ''; // Clear old results on every keystroke
 
         if (!inputValue) {
-            // If search box is cleared by the user, remove the saved player
             localStorage.removeItem('selectedPlayer');
             highlightSelectedPlayer();
+            updateHighlightedPlayerButtonState(); // <-- ADD THIS
             return;
         }
 
@@ -320,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 playerSearchInput.value = playerName; // Update the search box text
                 localStorage.setItem('selectedPlayer', playerName); // Save the selection
                 highlightSelectedPlayer(); // Apply the highlight
+                updateHighlightedPlayerButtonState();
                 autocompleteResults.innerHTML = ''; // Close the suggestions list
             });
 
@@ -336,13 +407,13 @@ document.addEventListener('DOMContentLoaded', () => {
         playerSearchInput.value = playerName; // Sync the search box
         localStorage.setItem('selectedPlayer', playerName); // Save selection
         highlightSelectedPlayer(); // Apply highlight
+        updateHighlightedPlayerButtonState();
         autocompleteResults.innerHTML = ''; // Close suggestions if they are open
     });
 
     // Listener to close the autocomplete list if the user clicks anywhere else
     document.addEventListener('click', (event) => {
         const searchContainer = document.querySelector('.autocomplete-container');
-        // If the click is outside the search container, close the results
         if (!searchContainer.contains(event.target)) {
             autocompleteResults.innerHTML = '';
         }
