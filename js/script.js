@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSortDirection = 'asc';
     let currentPage = 1; // For pagination
     let allPlayerNames = new Set(); // Using a Set for automatic uniqueness
+    let highlightedSortColumn = 'score'; // Default sort by EXP
+    let highlightedSortDirection = 'desc'; // Default to descending
 
     // --- SHARED CONSTANTS (for dynamic dropdown) ---
     const PLAYERS_AND_CLANS_SKILLS = [
@@ -44,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const highlightedPlayerBtn = document.querySelector("#highlighted-player-btn");
     const highlightedPlayerTitle = document.querySelector("#highlighted-player-title");
     const highlightedPlayerTableBody = document.querySelector("#highlighted-player-table tbody");
+    const highlightedPlayerTable = document.querySelector("#highlighted-player-table");
 
     // --- UTILITY FUNCTIONS ---
     const formatSkillName = (skill) => skill.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -154,6 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        playerRecords.sort((a, b) => {
+            const valA = a[highlightedSortColumn];
+            const valB = b[highlightedSortColumn];
+            const comparison = typeof valA === 'string' ? valA.localeCompare(valB) : valA - valB;
+            return highlightedSortDirection === 'desc' ? -comparison : comparison;
+        });
+
         if (playerRecords.length === 0) {
             highlightedPlayerTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem;">No leaderboard data found for this player.</td></tr>`;
             return;
@@ -176,6 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <td class="${expChangeClass}">${p.scoreDelta > 0 ? '+' : ''}${p.scoreDelta.toLocaleString()}</td>`;
             highlightedPlayerTableBody.appendChild(row);
         });
+
+        updateSortIndicators(highlightedPlayerTable, highlightedSortColumn, highlightedSortDirection);
     }
 
     // --- DATA & VIEW UPDATE LOGIC ---
@@ -188,10 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateSortIndicators() {
-        leaderboardTable.querySelectorAll('.sortable').forEach(header => {
+    function updateSortIndicators(tableElement, sortColumn, sortDirection) {
+        tableElement.querySelectorAll('.sortable').forEach(header => {
             const indicator = header.querySelector('.sort-indicator');
-            indicator.textContent = header.dataset.sort === currentSortColumn ? (currentSortDirection === 'asc' ? '▲' : '▼') : '';
+            if (indicator) {
+                indicator.textContent = header.dataset.sort === sortColumn ? (sortDirection === 'asc' ? '▲' : '▼') : '';
+            }
         });
     }
 
@@ -236,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         sortData();
         renderLeaderboardTable();
-        updateSortIndicators();
+        updateSortIndicators(leaderboardTable, currentSortColumn, currentSortDirection);
     }
 
     function highlightSelectedPlayer() {
@@ -339,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             sortData();
             renderLeaderboardTable();
-            updateSortIndicators();
+            updateSortIndicators(leaderboardTable, currentSortColumn, currentSortDirection);
         });
     });
 
@@ -409,6 +423,20 @@ document.addEventListener('DOMContentLoaded', () => {
         highlightSelectedPlayer(); // Apply highlight
         updateHighlightedPlayerButtonState();
         autocompleteResults.innerHTML = ''; // Close suggestions if they are open
+    });
+
+    highlightedPlayerTable.querySelectorAll('.sortable').forEach(header => {
+        header.addEventListener('click', () => {
+            const sortKey = header.dataset.sort;
+            if (sortKey === highlightedSortColumn) {
+                highlightedSortDirection = highlightedSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                highlightedSortColumn = sortKey;
+                highlightedSortDirection = 'asc';
+            }
+            // Re-render the view, which will now apply the new sort order
+            renderHighlightedPlayerView();
+        });
     });
 
     // Listener to close the autocomplete list if the user clicks anywhere else
